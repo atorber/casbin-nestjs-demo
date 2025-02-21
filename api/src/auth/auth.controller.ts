@@ -5,6 +5,8 @@ import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { CasbinGuard } from '../casbinconfig/guards/casbin-auth.guard';
+import { RequirePermissions } from '../casbinconfig/decorators/permissions.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 
 @ApiTags('Authentication')
@@ -13,7 +15,9 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('register')
-  @ApiOperation({ summary: 'Register a new user' })
+  @UseGuards(JwtAuthGuard, CasbinGuard)
+  @RequirePermissions('roles', 'write')
+  @ApiOperation({ summary: 'Register a new user (Admin only)' })
   @ApiResponse({ status: 201, description: 'User successfully registered' })
   @ApiResponse({ status: 409, description: 'Username or email already exists' })
   async register(@Body() registerDto: RegisterDto) {

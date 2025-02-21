@@ -17,7 +17,7 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto): Promise<{ access_token: string }> {
+  async register(registerDto: RegisterDto & { roles?: string[] }): Promise<{ access_token: string }> {
     // Check if user exists
     const existingUser = await this.usersRepository.findOne({
       where: [
@@ -37,7 +37,7 @@ export class AuthService {
     const user = this.usersRepository.create({
       ...registerDto,
       password: hashedPassword,
-      roles: ['user'], // Default role
+      roles: registerDto.roles || ['user'], // Default role if none provided
     });
 
     await this.usersRepository.save(user);

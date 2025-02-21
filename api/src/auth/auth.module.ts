@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { User } from '../users/entities/user.entity';
+import { CasbinModule } from '../casbinconfig/casbin.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { User } from '../users/entities/user.entity';
       }),
       inject: [ConfigService],
     }),
+    CasbinModule,
   ],
   controllers: [AuthController],
   providers: [AuthService, JwtStrategy],

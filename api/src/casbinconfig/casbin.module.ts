@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Module, Global } from '@nestjs/common';
 import { CasbinService } from './casbin.service';
 
+@Global()
 @Module({
   providers: [CasbinService],
   exports: [CasbinService],

@@ -1,5 +1,7 @@
 p, admin, users, read
 p, admin, users, write
 p, admin, users, delete
-p, user, users, read
+p, admin, roles, write
+p, user, own_user, read
+p, user, own_user, write
 g, admin, user 

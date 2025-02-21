@@ -4,9 +4,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
+import { CasbinModule } from './casbinconfig/casbin.module';
 import { User } from './users/entities/user.entity';
 import configuration from './config/configuration';
-
+import { UsersModule } from './users/users.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -24,6 +25,8 @@ import configuration from './config/configuration';
       inject: [ConfigService],
     }),
     AuthModule,
+    CasbinModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],

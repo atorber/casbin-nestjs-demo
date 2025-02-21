@@ -1,6 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { CasbinService } from '../casbin.service';
+import { PERMISSIONS_KEY } from '../decorators/permissions.decorator';
 
 @Injectable()
 export class CasbinGuard implements CanActivate {
@@ -15,7 +16,7 @@ export class CasbinGuard implements CanActivate {
 
     // Get the required permission from the route handler metadata
     const requiredPermission = this.reflector.get<string[]>(
-      'permissions',
+      PERMISSIONS_KEY,
       context.getHandler(),
     );
 
@@ -30,7 +31,20 @@ export class CasbinGuard implements CanActivate {
     // Extract object and action from the permission
     const [object, action] = requiredPermission;
 
-    // Check if user has the required permission
+    // Check if this is a user-specific operation
+    const paramId = request.params.id;
+    if (paramId && object === 'users') {
+      // If accessing own user data
+      if (parseInt(paramId) === user.userId) {
+        return this.casbinService.checkPermission(
+          user.username,
+          'own_user',
+          action,
+        );
+      }
+    }
+
+    // For all other cases, check regular permissions
     return this.casbinService.checkPermission(
       user.username,
       object,
