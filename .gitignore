@@ -7,6 +7,12 @@ dist/
 .env
 .env.*
 
+# Database
+db/
+/db/*
+*.sqlite
+*.sqlite-journal
+
 # IDE
 .idea/
 .vscode/

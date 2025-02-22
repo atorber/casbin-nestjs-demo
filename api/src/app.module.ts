@@ -8,6 +8,8 @@ import { CasbinModule } from './casbinconfig/casbin.module';
 import { User } from './users/entities/user.entity';
 import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
+import * as path from 'path';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -17,7 +19,7 @@ import { UsersModule } from './users/users.module';
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'sqlite',
-        database: 'db.sqlite',
+        database: path.join(process.cwd(), 'db', 'db.sqlite'),
         entities: [User],
         synchronize: true, // Set to false in production
         logging: true,
