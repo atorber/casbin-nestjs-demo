@@ -23,7 +23,7 @@ export function UserWelcome() {
     }
 
     // Fetch user info from the backend
-    fetch("http://localhost:8000/auth/me", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
       method: "GET",
       headers: {
         "Authorization": `Bearer ${token}`,

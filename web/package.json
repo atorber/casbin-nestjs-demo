@@ -1,7 +1,9 @@
 {
   "name": "web",
   "version": "0.1.0",
+  "description": "Next.js frontend for Casbin Demo",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "dev": "next dev -p 8001",
     "build": "next build",

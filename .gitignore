@@ -1,4 +1,4 @@
-# Dependencies
+# Dependencies & Compiled Output
 node_modules/
 dist/
 .next/
@@ -7,12 +7,26 @@ dist/
 .env
 .env.*
 
-
 # IDE
 .idea/
 .vscode/
 *.sublime-workspace
 *.sublime-project
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+
+# IDE - VSCode
+*.code-workspace
+/.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 
 # Cursor
 .cursor/
