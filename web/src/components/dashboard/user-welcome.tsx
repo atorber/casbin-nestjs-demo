@@ -55,15 +55,6 @@ export function UserWelcome() {
       });
   }, [router, toast]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    toast({
-      title: "Success",
-      description: "You have been logged out.",
-    });
-    router.push("/login");
-  };
-
   if (!userInfo) {
     return <div>Loading...</div>;
   }
@@ -77,9 +68,6 @@ export function UserWelcome() {
             You have successfully logged in to the Casbin Demo application.
           </p>
         </div>
-        <Button onClick={handleLogout} variant="outline">
-          Logout
-        </Button>
       </div>
       <div className="mt-4">
         <h2 className="text-xl font-semibold mb-2">Your Roles</h2>

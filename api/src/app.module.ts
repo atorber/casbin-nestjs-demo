@@ -19,7 +19,7 @@ import * as path from 'path';
     TypeOrmModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
         type: 'sqlite',
-        database: path.join(process.cwd(), 'db', 'db.sqlite'),
+        database: path.join(__dirname, '..', '..', 'db', 'db.sqlite'),
         entities: [User],
         synchronize: true, // Set to false in production
         logging: true,
