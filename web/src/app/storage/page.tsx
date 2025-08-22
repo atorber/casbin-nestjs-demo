@@ -73,6 +73,7 @@ export default function StoragePage() {
   const [showStorageInstanceDialog, setShowStorageInstanceDialog] = useState(false);
   const [showStoragePathDialog, setShowStoragePathDialog] = useState(false);
   const [showPermissionDialog, setShowPermissionDialog] = useState(false);
+  const [selectedPermissions, setSelectedPermissions] = useState<number[]>([]);
 
   const isAdmin = user?.roles.includes('admin');
 
@@ -175,6 +176,53 @@ export default function StoragePage() {
       toast({
         title: '错误',
         description: error.message || '撤销权限失败',
+        variant: 'destructive',
+      });
+    }
+  };
+
+  const handleBatchRevoke = async () => {
+    if (!token || selectedPermissions.length === 0) return;
+    
+    try {
+      // 获取选中的权限记录
+      const permissionsToRevoke = storagePermissions.filter(perm => 
+        selectedPermissions.includes(perm.id)
+      );
+      
+      // 按存储路径分组，因为批量撤销需要相同的storagePathId
+      const groupedPermissions = permissionsToRevoke.reduce((acc, perm) => {
+        if (!acc[perm.storagePathId]) {
+          acc[perm.storagePathId] = [];
+        }
+        acc[perm.storagePathId].push(perm.userId);
+        return acc;
+      }, {} as Record<number, number[]>);
+
+      // 批量撤销每个存储路径的权限
+      for (const [storagePathId, userIds] of Object.entries(groupedPermissions)) {
+        await apiClient.post('/storage/permissions/batch/revoke', {
+          userIds,
+          storagePathId: parseInt(storagePathId)
+        }, token);
+      }
+
+      // 从列表中移除已撤销的权限
+      setStoragePermissions(prev => 
+        prev.filter(perm => !selectedPermissions.includes(perm.id))
+      );
+      
+      // 清空选择
+      setSelectedPermissions([]);
+      
+      toast({
+        title: '成功',
+        description: `批量撤销了 ${selectedPermissions.length} 个权限`,
+      });
+    } catch (error: any) {
+      toast({
+        title: '错误',
+        description: error.message || '批量撤销权限失败',
         variant: 'destructive',
       });
     }
@@ -336,9 +384,18 @@ export default function StoragePage() {
                     管理用户对存储路径的访问权限，包括读取和写入权限
                   </CardDescription>
                 </div>
-                <Button onClick={() => setShowPermissionDialog(true)}>
-                  授予权限
-                </Button>
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={handleBatchRevoke}
+                    disabled={selectedPermissions.length === 0}
+                  >
+                    批量撤销 ({selectedPermissions.length})
+                  </Button>
+                  <Button onClick={() => setShowPermissionDialog(true)}>
+                    授予权限
+                  </Button>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -350,33 +407,47 @@ export default function StoragePage() {
                 ) : (
                   storagePermissions.map((permission) => (
                     <div key={permission.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3 mb-2">
-                          <div className="font-medium text-lg">
-                            {permission.user?.username || `用户ID: ${permission.userId}`}
-                          </div>
-                          <Badge variant={permission.permission === 'write' ? 'default' : 'secondary'}>
-                            {permission.permission === 'write' ? '读写' : '只读'}
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          <span className="font-medium">存储路径:</span> {permission.storagePath?.path || `路径ID: ${permission.storagePathId}`}
-                        </div>
-                        {permission.storagePath?.storageInstance && (
-                          <div className="text-sm text-muted-foreground">
-                            <span className="font-medium">存储实例:</span> {permission.storagePath.storageInstance.name} 
-                            <Badge variant="outline" className="ml-2 text-xs">
-                              {permission.storagePath.storageInstance.type === 'local' ? '本地存储' : 
-                               permission.storagePath.storageInstance.type === 's3' ? 'Amazon S3' :
-                               permission.storagePath.storageInstance.type === 'minio' ? 'MinIO' :
-                               permission.storagePath.storageInstance.type === 'aliyun_oss' ? '阿里云OSS' :
-                               permission.storagePath.storageInstance.type === 'tencent_cos' ? '腾讯云COS' :
-                               permission.storagePath.storageInstance.type === 'qiniu' ? '七牛云' : permission.storagePath.storageInstance.type}
+                      <div className="flex items-center gap-3">
+                        <input
+                          type="checkbox"
+                          checked={selectedPermissions.includes(permission.id)}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              setSelectedPermissions([...selectedPermissions, permission.id]);
+                            } else {
+                              setSelectedPermissions(selectedPermissions.filter(id => id !== permission.id));
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="font-medium text-lg">
+                              {permission.user?.username || `用户ID: ${permission.userId}`}
+                            </div>
+                            <Badge variant={permission.permission === 'write' ? 'default' : 'secondary'}>
+                              {permission.permission === 'write' ? '读写' : '只读'}
                             </Badge>
                           </div>
-                        )}
-                        <div className="text-xs text-muted-foreground mt-1">
-                          授予时间: {new Date(permission.grantedAt).toLocaleString()}
+                          <div className="text-sm text-muted-foreground">
+                            <span className="font-medium">存储路径:</span> {permission.storagePath?.path || `路径ID: ${permission.storagePathId}`}
+                          </div>
+                          {permission.storagePath?.storageInstance && (
+                            <div className="text-sm text-muted-foreground">
+                              <span className="font-medium">存储实例:</span> {permission.storagePath.storageInstance.name} 
+                              <Badge variant="outline" className="ml-2 text-xs">
+                                {permission.storagePath.storageInstance.type === 'local' ? '本地存储' : 
+                                 permission.storagePath.storageInstance.type === 's3' ? 'Amazon S3' :
+                                 permission.storagePath.storageInstance.type === 'minio' ? 'MinIO' :
+                                 permission.storagePath.storageInstance.type === 'aliyun_oss' ? '阿里云OSS' :
+                                 permission.storagePath.storageInstance.type === 'tencent_cos' ? '腾讯云COS' :
+                                 permission.storagePath.storageInstance.type === 'qiniu' ? '七牛云' : permission.storagePath.storageInstance.type}
+                              </Badge>
+                            </div>
+                          )}
+                          <div className="text-xs text-muted-foreground mt-1">
+                            授予时间: {new Date(permission.grantedAt).toLocaleString()}
+                          </div>
                         </div>
                       </div>
                       <Button

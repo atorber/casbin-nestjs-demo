@@ -15,8 +15,11 @@ describe('AppController', () => {
   });
 
   describe('root', () => {
-    it('should return "Hello World!"', () => {
-      expect(appController.getHello()).toBe('Hello World!');
+    it('should return welcome message', () => {
+      const result = appController.getHello();
+      expect(result).toHaveProperty('message');
+      expect(result).toHaveProperty('timestamp');
+      expect(result.message).toContain('欢迎使用');
     });
   });
 });

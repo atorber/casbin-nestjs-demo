@@ -13,7 +13,7 @@ import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
 
 const formSchema = z.object({
-  userId: z.string().min(1, { message: '请选择用户' }),
+  userIds: z.array(z.string()).min(1, { message: '请至少选择一个用户' }),
   storagePathId: z.string().min(1, { message: '请选择存储路径' }),
   permission: z.enum(['read', 'write'], { message: '请选择权限类型' }),
 });
@@ -49,7 +49,7 @@ export function StoragePermissionDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userId: '',
+      userIds: [],
       storagePathId: '',
       permission: 'read',
     },
@@ -82,7 +82,7 @@ export function StoragePermissionDialog({
     try {
       setLoading(true);
       const response = await apiClient.post('/storage/permissions', {
-        userId: parseInt(values.userId),
+        userIds: values.userIds.map(id => parseInt(id)),
         storagePathId: parseInt(values.storagePathId),
         permission: values.permission,
       }, token);
@@ -110,30 +110,39 @@ export function StoragePermissionDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>授予存储权限</DialogTitle>
+          <DialogTitle>批量授予存储权限</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="userId"
+              name="userIds"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>选择用户</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择用户" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {users.map((user) => (
-                        <SelectItem key={user.id} value={user.id.toString()}>
+                  <FormLabel>选择用户（可多选）</FormLabel>
+                  <div className="space-y-2">
+                    {users.map((user) => (
+                      <div key={user.id} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`user-${user.id}`}
+                          value={user.id.toString()}
+                          checked={field.value.includes(user.id.toString())}
+                          onChange={(e) => {
+                            if (e.target.checked) {
+                              field.onChange([...field.value, e.target.value]);
+                            } else {
+                              field.onChange(field.value.filter(id => id !== e.target.value));
+                            }
+                          }}
+                          className="rounded border-gray-300"
+                        />
+                        <label htmlFor={`user-${user.id}`} className="text-sm">
                           {user.username} ({user.email})
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
@@ -193,7 +202,7 @@ export function StoragePermissionDialog({
                 取消
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? '授予中...' : '授予权限'}
+                {loading ? '授予中...' : '批量授予权限'}
               </Button>
             </div>
           </form>

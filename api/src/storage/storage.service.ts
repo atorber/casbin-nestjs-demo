@@ -54,7 +54,7 @@ export class StorageService {
 
   async getAllStoragePaths(): Promise<StoragePath[]> {
     console.log('StorageService - getAllStoragePaths 开始执行');
-    
+
     // 使用原生SQL查询来确保获取完整的关联数据
     const rawData = await this.storagePathRepository.query(`
       SELECT 
@@ -92,7 +92,7 @@ export class StorageService {
     console.log('StorageService - 第一个原始数据行:', rawData[0]);
 
     // 转换原始数据为实体格式
-    const result = rawData.map(row => ({
+    const result = rawData.map((row) => ({
       id: row.id,
       path: row.path,
       description: row.description,
@@ -106,25 +106,35 @@ export class StorageService {
         username: row.createdBy_username,
         email: row.createdBy_email,
         isActive: row.createdBy_isActive,
-        roles: typeof row.createdBy_roles === 'string' ? [row.createdBy_roles] : row.createdBy_roles,
+        roles:
+          typeof row.createdBy_roles === 'string'
+            ? [row.createdBy_roles]
+            : row.createdBy_roles,
         createdAt: row.createdBy_createdAt,
-        updatedAt: row.createdBy_updatedAt
+        updatedAt: row.createdBy_updatedAt,
       },
       storageInstance: {
         id: row.si_id,
         name: row.si_name,
         type: row.si_type,
         description: row.si_description,
-        config: row.si_config ? (typeof row.si_config === 'string' ? JSON.parse(row.si_config) : row.si_config) : null,
+        config: row.si_config
+          ? typeof row.si_config === 'string'
+            ? JSON.parse(row.si_config)
+            : row.si_config
+          : null,
         isActive: row.si_isActive,
         createdById: row.si_createdById,
         createdAt: row.si_createdAt,
-        updatedAt: row.si_updatedAt
-      }
+        updatedAt: row.si_updatedAt,
+      },
     }));
 
     console.log('StorageService - 转换后的结果数量:', result.length);
-    console.log('StorageService - 第一个结果的存储实例:', result[0]?.storageInstance);
+    console.log(
+      'StorageService - 第一个结果的存储实例:',
+      result[0]?.storageInstance,
+    );
 
     return result;
   }
@@ -154,19 +164,12 @@ export class StorageService {
 
   async grantPermission(
     grantPermissionDto: GrantStoragePermissionDto,
-  ): Promise<StoragePermissionEntity> {
-    // 检查用户是否存在
-    const user = await this.userRepository.findOne({
-      where: { id: grantPermissionDto.userId },
-    });
-
-    if (!user) {
-      throw new NotFoundException('用户不存在');
-    }
+  ): Promise<StoragePermissionEntity[]> {
+    const { userIds, storagePathId, permission } = grantPermissionDto;
 
     // 检查存储路径是否存在
     const storagePath = await this.storagePathRepository.findOne({
-      where: { id: grantPermissionDto.storagePathId },
+      where: { id: storagePathId },
       relations: ['storageInstance'],
     });
 
@@ -174,38 +177,54 @@ export class StorageService {
       throw new NotFoundException('存储路径不存在');
     }
 
-    // 检查权限是否已存在
-    const existingPermission = await this.storagePermissionRepository.findOne({
-      where: {
-        userId: grantPermissionDto.userId,
-        storagePathId: grantPermissionDto.storagePathId,
-      },
-    });
-
-    if (existingPermission) {
-      // 更新现有权限
-      existingPermission.permission = grantPermissionDto.permission;
-      const savedPermission = await this.storagePermissionRepository.save(
-        existingPermission,
-      );
-      // 返回完整的关联数据
-      return this.storagePermissionRepository.findOne({
-        where: { id: savedPermission.id },
-        relations: ['user', 'storagePath', 'storagePath.createdBy'],
-      });
+    // 检查所有用户是否存在
+    const users = await this.userRepository.findByIds(userIds);
+    if (users.length !== userIds.length) {
+      throw new NotFoundException('部分用户不存在');
     }
 
-    // 创建新权限
-    const permission =
-      this.storagePermissionRepository.create(grantPermissionDto);
-    const savedPermission = await this.storagePermissionRepository.save(
-      permission,
-    );
-    // 返回完整的关联数据
-    return this.storagePermissionRepository.findOne({
-      where: { id: savedPermission.id },
-      relations: ['user', 'storagePath', 'storagePath.createdBy', 'storagePath.storageInstance'],
+    // 批量检查权限是否已存在
+    const existingPermissions = await this.storagePermissionRepository.find({
+      where: userIds.map((userId) => ({ userId, storagePathId })),
     });
+
+    if (existingPermissions.length > 0) {
+      const existingUserIds = existingPermissions.map((p) => p.userId);
+      throw new ConflictException(
+        `用户 ${existingUserIds.join(', ')} 的权限已存在`,
+      );
+    }
+
+    // 批量创建权限记录
+    const permissionEntities = userIds.map((userId) =>
+      this.storagePermissionRepository.create({
+        userId,
+        storagePathId,
+        permission,
+        grantedAt: new Date(),
+      }),
+    );
+
+    const savedPermissions = await this.storagePermissionRepository.save(
+      permissionEntities,
+    );
+
+    // 返回完整的关联数据
+    const result = await Promise.all(
+      savedPermissions.map((permission) =>
+        this.storagePermissionRepository.findOne({
+          where: { id: permission.id },
+          relations: [
+            'user',
+            'storagePath',
+            'storagePath.createdBy',
+            'storagePath.storageInstance',
+          ],
+        }),
+      ),
+    );
+
+    return result.filter(Boolean);
   }
 
   async revokePermission(userId: number, storagePathId: number): Promise<void> {
@@ -220,11 +239,27 @@ export class StorageService {
     await this.storagePermissionRepository.remove(permission);
   }
 
+  async revokeMultiplePermissions(
+    userIds: number[],
+    storagePathId: number,
+  ): Promise<void> {
+    const permissions = await this.storagePermissionRepository.find({
+      where: userIds.map((userId) => ({ userId, storagePathId })),
+    });
+
+    if (permissions.length === 0) {
+      throw new NotFoundException('未找到要撤销的权限记录');
+    }
+
+    await this.storagePermissionRepository.remove(permissions);
+  }
+
   async getUserStoragePermissions(
     userId: number,
   ): Promise<StoragePermissionEntity[]> {
     // 使用原生SQL查询来确保获取完整的关联数据
-    const rawData = await this.storagePermissionRepository.query(`
+    const rawData = await this.storagePermissionRepository.query(
+      `
       SELECT 
         sp.id,
         sp.userId,
@@ -269,10 +304,12 @@ export class StorageService {
       LEFT JOIN users creator ON stp.createdById = creator.id
       WHERE sp.userId = ?
       ORDER BY sp.grantedAt DESC
-    `, [userId]);
+    `,
+      [userId],
+    );
 
     // 转换原始数据为实体格式
-    return rawData.map(row => ({
+    return rawData.map((row) => ({
       id: row.id,
       userId: row.userId,
       storagePathId: row.storagePathId,
@@ -283,9 +320,12 @@ export class StorageService {
         username: row.user_username,
         email: row.user_email,
         isActive: row.user_isActive,
-        roles: typeof row.user_roles === 'string' ? [row.user_roles] : row.user_roles,
+        roles:
+          typeof row.user_roles === 'string'
+            ? [row.user_roles]
+            : row.user_roles,
         createdAt: row.user_createdAt,
-        updatedAt: row.user_updatedAt
+        updatedAt: row.user_updatedAt,
       },
       storagePath: {
         id: row.storagePath_id,
@@ -301,22 +341,29 @@ export class StorageService {
           name: row.si_name,
           type: row.si_type,
           description: row.si_description,
-          config: row.si_config ? (typeof row.si_config === 'string' ? JSON.parse(row.si_config) : row.si_config) : null,
+          config: row.si_config
+            ? typeof row.si_config === 'string'
+              ? JSON.parse(row.si_config)
+              : row.si_config
+            : null,
           isActive: row.si_isActive,
           createdById: row.si_createdById,
           createdAt: row.si_createdAt,
-          updatedAt: row.si_updatedAt
+          updatedAt: row.si_updatedAt,
         },
         createdBy: {
           id: row.creator_id,
           username: row.creator_username,
           email: row.creator_email,
           isActive: row.creator_isActive,
-          roles: typeof row.creator_roles === 'string' ? [row.creator_roles] : row.creator_roles,
+          roles:
+            typeof row.creator_roles === 'string'
+              ? [row.creator_roles]
+              : row.creator_roles,
           createdAt: row.creator_createdAt,
-          updatedAt: row.creator_updatedAt
-        }
-      }
+          updatedAt: row.creator_updatedAt,
+        },
+      },
     }));
   }
 
@@ -369,7 +416,7 @@ export class StorageService {
     `);
 
     // 转换原始数据为实体格式
-    return rawData.map(row => ({
+    return rawData.map((row) => ({
       id: row.id,
       userId: row.userId,
       storagePathId: row.storagePathId,
@@ -380,9 +427,12 @@ export class StorageService {
         username: row.user_username,
         email: row.user_email,
         isActive: row.user_isActive,
-        roles: typeof row.user_roles === 'string' ? [row.user_roles] : row.user_roles,
+        roles:
+          typeof row.user_roles === 'string'
+            ? [row.user_roles]
+            : row.user_roles,
         createdAt: row.user_createdAt,
-        updatedAt: row.user_updatedAt
+        updatedAt: row.user_updatedAt,
       },
       storagePath: {
         id: row.storagePath_id,
@@ -398,22 +448,29 @@ export class StorageService {
           name: row.si_name,
           type: row.si_type,
           description: row.si_description,
-          config: row.si_config ? (typeof row.si_config === 'string' ? JSON.parse(row.si_config) : row.si_config) : null,
+          config: row.si_config
+            ? typeof row.si_config === 'string'
+              ? JSON.parse(row.si_config)
+              : row.si_config
+            : null,
           isActive: row.si_isActive,
           createdById: row.si_createdById,
           createdAt: row.si_createdAt,
-          updatedAt: row.si_updatedAt
+          updatedAt: row.si_updatedAt,
         },
         createdBy: {
           id: row.creator_id,
           username: row.creator_username,
           email: row.creator_email,
           isActive: row.creator_isActive,
-          roles: typeof row.creator_roles === 'string' ? [row.creator_roles] : row.creator_roles,
+          roles:
+            typeof row.creator_roles === 'string'
+              ? [row.creator_roles]
+              : row.creator_roles,
           createdAt: row.creator_createdAt,
-          updatedAt: row.creator_updatedAt
-        }
-      }
+          updatedAt: row.creator_updatedAt,
+        },
+      },
     }));
   }
 

@@ -84,17 +84,18 @@ async function bootstrap() {
 
     // Create storage permissions
     const permissions = [
-      { userId: 2, storagePathId: 1, permission: StoragePermission.READ },
-      { userId: 2, storagePathId: 2, permission: StoragePermission.READ },
-      { userId: 3, storagePathId: 1, permission: StoragePermission.READ },
-      { userId: 3, storagePathId: 3, permission: StoragePermission.READ },
+      { userIds: [2], storagePathId: 1, permission: StoragePermission.READ },
+      { userIds: [2], storagePathId: 2, permission: StoragePermission.READ },
+      { userIds: [3], storagePathId: 1, permission: StoragePermission.READ },
+      { userIds: [3], storagePathId: 3, permission: StoragePermission.READ },
     ];
 
     for (const permissionData of permissions) {
       try {
+        // 检查权限是否已存在（检查第一个用户）
         const existingPermission = await storagePermissionRepository.findOne({
           where: {
-            userId: permissionData.userId,
+            userId: permissionData.userIds[0],
             storagePathId: permissionData.storagePathId,
           },
         });
@@ -102,16 +103,16 @@ async function bootstrap() {
         if (!existingPermission) {
           await storageService.grantPermission(permissionData);
           console.log(
-            `权限授予成功: 用户 ${permissionData.userId} -> 路径 ${permissionData.storagePathId}`,
+            `权限授予成功: 用户 ${permissionData.userIds.join(', ')} -> 路径 ${permissionData.storagePathId}`,
           );
         } else {
           console.log(
-            `权限已存在: 用户 ${permissionData.userId} -> 路径 ${permissionData.storagePathId}`,
+            `权限已存在: 用户 ${permissionData.userIds.join(', ')} -> 路径 ${permissionData.storagePathId}`,
           );
         }
       } catch (error) {
         console.error(
-          `授予权限失败: 用户 ${permissionData.userId} -> 路径 ${permissionData.storagePathId}:`,
+          `授予权限失败: 用户 ${permissionData.userIds.join(', ')} -> 路径 ${permissionData.storagePathId}:`,
           (error as any).message,
         );
       }

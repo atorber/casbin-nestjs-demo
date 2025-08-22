@@ -108,23 +108,24 @@ export class StorageController {
 
   @Post('permissions')
   @RequirePermissions('storage', 'write')
-  @ApiOperation({ summary: '授予存储权限（仅管理员）' })
+  @ApiOperation({ summary: '批量授予存储权限（仅管理员）' })
   @ApiResponse({
     status: 201,
     description: '权限授予成功',
-    type: StoragePermissionEntity,
+    type: [StoragePermissionEntity],
   })
   @ApiResponse({ status: 403, description: '禁止访问 - 仅限管理员' })
   @ApiResponse({ status: 404, description: '用户或存储路径不存在' })
+  @ApiResponse({ status: 409, description: '部分用户权限已存在' })
   async grantPermission(
     @Body() grantPermissionDto: GrantStoragePermissionDto,
-  ): Promise<StoragePermissionEntity> {
+  ): Promise<StoragePermissionEntity[]> {
     return this.storageService.grantPermission(grantPermissionDto);
   }
 
   @Delete('permissions/:userId/:storagePathId')
   @RequirePermissions('storage', 'write')
-  @ApiOperation({ summary: '撤销存储权限（仅管理员）' })
+  @ApiOperation({ summary: '撤销单个存储权限（仅管理员）' })
   @ApiResponse({ status: 200, description: '权限撤销成功' })
   @ApiResponse({ status: 403, description: '禁止访问 - 仅限管理员' })
   @ApiResponse({ status: 404, description: '权限记录不存在' })
@@ -133,6 +134,21 @@ export class StorageController {
     @Param('storagePathId', ParseIntPipe) storagePathId: number,
   ): Promise<void> {
     return this.storageService.revokePermission(userId, storagePathId);
+  }
+
+  @Post('permissions/batch/revoke')
+  @RequirePermissions('storage', 'write')
+  @ApiOperation({ summary: '批量撤销存储权限（仅管理员）' })
+  @ApiResponse({ status: 200, description: '批量权限撤销成功' })
+  @ApiResponse({ status: 403, description: '禁止访问 - 仅限管理员' })
+  @ApiResponse({ status: 404, description: '未找到要撤销的权限记录' })
+  async revokeMultiplePermissions(
+    @Body() body: { userIds: number[]; storagePathId: number },
+  ): Promise<void> {
+    return this.storageService.revokeMultiplePermissions(
+      body.userIds,
+      body.storagePathId,
+    );
   }
 
   @Get('permissions')
