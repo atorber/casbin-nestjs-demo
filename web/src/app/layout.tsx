@@ -8,8 +8,8 @@ import { NavBar } from "@/components/layout/nav-bar";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Casbin Demo",
-  description: "Demo application showcasing NestJS, NextJS and Casbin integration",
+  title: "Casbin 权限管理演示",
+  description: "展示 NestJS、NextJS 和 Casbin 集成的演示应用",
 };
 
 export default function RootLayout({
@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="zh-CN">
       <body className={inter.className}>
         <AuthProvider>
           <NavBar />

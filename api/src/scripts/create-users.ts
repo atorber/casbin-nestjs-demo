@@ -42,12 +42,12 @@ async function bootstrap() {
       if (!user) {
         // Create new user if doesn't exist
         const result = await authService.register(userData);
-        console.log(`User ${userData.username} created successfully`);
+        console.log(`用户 ${userData.username} 创建成功`);
         user = await userRepository.findOne({
           where: { username: userData.username },
         });
       } else {
-        console.log(`User ${userData.username} already exists, updating roles...`);
+        console.log(`用户 ${userData.username} 已存在，正在更新角色...`);
         // Update user roles in the database
         user.roles = userData.roles;
         await userRepository.save(user);
@@ -62,10 +62,10 @@ async function bootstrap() {
       // Add new roles to Casbin
       for (const role of userData.roles) {
         await casbinService.addRoleForUser(userData.username, role);
-        console.log(`Role ${role} assigned to ${userData.username}`);
+        console.log(`角色 ${role} 已分配给用户 ${userData.username}`);
       }
     } catch (error) {
-      console.error(`Failed to process user ${userData.username}:`, error.message);
+      console.error(`处理用户 ${userData.username} 失败:`, error.message);
     }
   }
 

@@ -9,7 +9,7 @@ import { CasbinGuard } from '../casbinconfig/guards/casbin-auth.guard';
 import { RequirePermissions } from '../casbinconfig/decorators/permissions.decorator';
 import { CurrentUser } from './decorators/current-user.decorator';
 
-@ApiTags('Authentication')
+@ApiTags('认证')
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
@@ -17,17 +17,17 @@ export class AuthController {
   @Post('register')
   @UseGuards(JwtAuthGuard, CasbinGuard)
   @RequirePermissions('roles', 'write')
-  @ApiOperation({ summary: 'Register a new user (Admin only)' })
-  @ApiResponse({ status: 201, description: 'User successfully registered' })
-  @ApiResponse({ status: 409, description: 'Username or email already exists' })
+  @ApiOperation({ summary: '注册新用户（仅管理员）' })
+  @ApiResponse({ status: 201, description: '用户注册成功' })
+  @ApiResponse({ status: 409, description: '用户名或邮箱已存在' })
   async register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
   }
 
   @Post('login')
-  @ApiOperation({ summary: 'Login with username and password' })
-  @ApiResponse({ status: 200, description: 'User successfully logged in' })
-  @ApiResponse({ status: 401, description: 'Invalid credentials' })
+  @ApiOperation({ summary: '使用用户名和密码登录' })
+  @ApiResponse({ status: 200, description: '用户登录成功' })
+  @ApiResponse({ status: 401, description: '用户名或密码错误' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
   }
@@ -35,9 +35,9 @@ export class AuthController {
   @Get('me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  @ApiOperation({ summary: 'Get current user details' })
-  @ApiResponse({ status: 200, description: 'Returns current user details', type: UserResponseDto })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiOperation({ summary: '获取当前用户详情' })
+  @ApiResponse({ status: 200, description: '返回当前用户详情', type: UserResponseDto })
+  @ApiResponse({ status: 401, description: '未授权' })
   async getCurrentUser(@CurrentUser() user: { userId: number }) {
     return this.authService.getUserById(user.userId);
   }

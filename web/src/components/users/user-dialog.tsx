@@ -63,16 +63,16 @@ export function UserDialog({ user, token, open, onOpenChange, onSuccess }: UserD
       setLoading(true);
       await updateUser(token, user.id, values);
       toast({
-        title: 'Success',
-        description: 'User updated successfully',
+        title: '成功',
+        description: '用户更新成功',
       });
       onSuccess();
       onOpenChange(false);
     } catch (err) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to update user',
+        title: '错误',
+        description: err instanceof Error ? err.message : '更新用户失败',
       });
     } finally {
       setLoading(false);
@@ -83,7 +83,7 @@ export function UserDialog({ user, token, open, onOpenChange, onSuccess }: UserD
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit User</DialogTitle>
+          <DialogTitle>编辑用户</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -92,9 +92,9 @@ export function UserDialog({ user, token, open, onOpenChange, onSuccess }: UserD
               name="username"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
+                  <FormLabel>用户名</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter username" {...field} />
+                    <Input placeholder="请输入用户名" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -105,9 +105,9 @@ export function UserDialog({ user, token, open, onOpenChange, onSuccess }: UserD
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>邮箱</FormLabel>
                   <FormControl>
-                    <Input type="email" placeholder="Enter email" {...field} />
+                    <Input type="email" placeholder="请输入邮箱" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -118,11 +118,11 @@ export function UserDialog({ user, token, open, onOpenChange, onSuccess }: UserD
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>New Password</FormLabel>
+                  <FormLabel>新密码</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      placeholder="Enter new password"
+                      placeholder="请输入新密码"
                       {...field}
                     />
                   </FormControl>
@@ -136,10 +136,10 @@ export function UserDialog({ user, token, open, onOpenChange, onSuccess }: UserD
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                取消
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? '保存中...' : '保存更改'}
               </Button>
             </div>
           </form>

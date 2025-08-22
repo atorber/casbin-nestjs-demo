@@ -32,7 +32,7 @@ export function UserWelcome() {
     })
       .then((res) => {
         if (!res.ok) {
-          throw new Error("Failed to fetch user info");
+          throw new Error("获取用户信息失败");
         }
         return res.json();
       })
@@ -43,8 +43,8 @@ export function UserWelcome() {
       .catch((error) => {
         console.error("Error fetching user info:", error);
         toast({
-          title: "Error",
-          description: "Failed to fetch user information",
+          title: "错误",
+          description: "获取用户信息失败",
           variant: "destructive",
         });
         // If unauthorized, redirect to login
@@ -56,21 +56,21 @@ export function UserWelcome() {
   }, [router, toast]);
 
   if (!userInfo) {
-    return <div>Loading...</div>;
+    return <div>加载中...</div>;
   }
 
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="mb-2 text-3xl font-bold">Welcome, {userInfo.username}!</h1>
+          <h1 className="mb-2 text-3xl font-bold">欢迎，{userInfo.username}！</h1>
           <p className="text-lg text-muted-foreground">
-            You have successfully logged in to the Casbin Demo application.
+            您已成功登录到 Casbin 权限管理演示应用。
           </p>
         </div>
       </div>
       <div className="mt-4">
-        <h2 className="text-xl font-semibold mb-2">Your Roles</h2>
+        <h2 className="text-xl font-semibold mb-2">您的角色</h2>
         <div className="flex gap-2">
           {userInfo.roles?.map((role) => (
             <span

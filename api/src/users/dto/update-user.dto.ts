@@ -2,23 +2,23 @@ import { IsString, IsEmail, IsOptional, MinLength, Matches } from 'class-validat
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: '用户名' })
   @IsOptional()
   @IsString()
   @MinLength(3)
   username?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: '邮箱地址' })
   @IsOptional()
   @IsEmail()
   email?: string;
 
-  @ApiPropertyOptional()
+  @ApiPropertyOptional({ description: '新密码' })
   @IsOptional()
   @IsString()
   @MinLength(8)
   @Matches(/((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/, {
-    message: 'Password must contain uppercase, lowercase, number/special character',
+    message: '密码必须包含大写字母、小写字母、数字或特殊字符',
   })
   password?: string;
 } 

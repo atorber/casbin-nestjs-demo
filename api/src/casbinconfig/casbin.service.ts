@@ -23,10 +23,10 @@ export class CasbinService implements OnModuleInit {
 
     // Verify that the files exist
     if (!fs.existsSync(modelPath)) {
-      throw new Error(`Casbin model file not found at ${modelPath}`);
+      throw new Error(`Casbin 模型文件未找到：${modelPath}`);
     }
     if (!fs.existsSync(policyPath)) {
-      throw new Error(`Casbin policy file not found at ${policyPath}`);
+      throw new Error(`Casbin 策略文件未找到：${policyPath}`);
     }
 
     // Initialize the Casbin enforcer

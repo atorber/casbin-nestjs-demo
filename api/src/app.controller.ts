@@ -7,16 +7,16 @@ export class HelloWorldResponse {
   timestamp: string;
 }
 
-@ApiTags('App')
+@ApiTags('应用')
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Get hello world message' })
+  @ApiOperation({ summary: '获取欢迎消息' })
   @ApiResponse({
     status: 200,
-    description: 'Returns a hello world message with timestamp',
+    description: '返回带有时间戳的欢迎消息',
     type: HelloWorldResponse,
   })
   getHello(): HelloWorldResponse {

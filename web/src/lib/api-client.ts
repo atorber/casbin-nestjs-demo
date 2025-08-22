@@ -30,10 +30,10 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     if (response.status === 403) {
-      throw new Error('Permission denied. You do not have access to this resource.');
+      throw new Error('权限被拒绝。您无权访问此资源。');
     }
-    const error = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(error.message || 'An error occurred');
+    const error = await response.json().catch(() => ({ message: '发生错误' }));
+    throw new Error(error.message || '发生错误');
   }
   return response.json();
 }

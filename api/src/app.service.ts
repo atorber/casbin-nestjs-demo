@@ -5,7 +5,7 @@ import { HelloWorldResponse } from './app.controller';
 export class AppService {
   getHello(): HelloWorldResponse {
     return {
-      message: 'Hello World!',
+      message: '欢迎使用 Casbin 权限管理系统！',
       timestamp: new Date().toISOString(),
     };
   }

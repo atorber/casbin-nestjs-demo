@@ -66,16 +66,16 @@ export function UserRolesDialog({
       setLoading(true);
       await updateUserRoles(token, user.id, values);
       toast({
-        title: 'Success',
-        description: 'User roles updated successfully',
+        title: '成功',
+        description: '用户角色更新成功',
       });
       onSuccess();
       onOpenChange(false);
     } catch (err) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to update user roles',
+        title: '错误',
+        description: err instanceof Error ? err.message : '更新用户角色失败',
       });
     } finally {
       setLoading(false);
@@ -86,7 +86,7 @@ export function UserRolesDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit User Roles</DialogTitle>
+          <DialogTitle>编辑用户角色</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -95,7 +95,7 @@ export function UserRolesDialog({
               name="roles"
               render={() => (
                 <FormItem>
-                  <FormLabel>Roles</FormLabel>
+                  <FormLabel>角色</FormLabel>
                   <div className="space-y-2">
                     {AVAILABLE_ROLES.map((role) => (
                       <FormField
@@ -116,7 +116,7 @@ export function UserRolesDialog({
                               />
                             </FormControl>
                             <FormLabel className="capitalize">
-                              {role}
+                              {role === 'admin' ? '管理员' : '用户'}
                             </FormLabel>
                           </FormItem>
                         )}
@@ -133,10 +133,10 @@ export function UserRolesDialog({
                 variant="outline"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                取消
               </Button>
               <Button type="submit" disabled={loading}>
-                {loading ? 'Saving...' : 'Save Changes'}
+                {loading ? '保存中...' : '保存更改'}
               </Button>
             </div>
           </form>

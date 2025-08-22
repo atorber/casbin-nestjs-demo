@@ -14,7 +14,7 @@ export default function DashboardPage() {
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardHeader>
-              <CardTitle>Welcome</CardTitle>
+              <CardTitle>欢迎</CardTitle>
             </CardHeader>
             <CardContent>
               <UserWelcome />
@@ -24,17 +24,17 @@ export default function DashboardPage() {
           {user?.roles.includes('admin') && (
             <Card>
               <CardHeader>
-                <CardTitle>User Management</CardTitle>
+                <CardTitle>用户管理</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-sm text-muted-foreground">
-                  Manage users and their roles in the system.
+                  管理系统中的用户和他们的角色。
                 </p>
                 <a
                   href="/users"
                   className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
                 >
-                  Go to User Management →
+                  前往用户管理 →
                 </a>
               </CardContent>
             </Card>
@@ -42,17 +42,17 @@ export default function DashboardPage() {
 
           <Card>
             <CardHeader>
-              <CardTitle>My Profile</CardTitle>
+              <CardTitle>我的资料</CardTitle>
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                View and update your profile information.
+                查看和更新您的个人资料信息。
               </p>
               <a
                 href="/profile"
                 className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
               >
-                Go to Profile →
+                前往个人资料 →
               </a>
             </CardContent>
           </Card>

@@ -12,9 +12,9 @@ export function NavBar() {
   const { user, logout } = useAuth();
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', show: !!user },
-    { name: 'User Management', href: '/users', show: user?.roles.includes('admin') },
-    { name: 'My Profile', href: '/profile', show: !!user },
+    { name: '仪表板', href: '/dashboard', show: !!user },
+    { name: '用户管理', href: '/users', show: user?.roles.includes('admin') },
+    { name: '我的资料', href: '/profile', show: !!user },
   ];
 
   const handleLogin = () => {
@@ -31,7 +31,7 @@ export function NavBar() {
       <div className="container mx-auto flex h-16 items-center px-4">
         <div className="mr-8 flex">
           <Link href="/" className="flex items-center space-x-2">
-            <span className="text-lg font-bold">Casbin Demo</span>
+            <span className="text-lg font-bold">Casbin 权限管理演示</span>
           </Link>
         </div>
         <div className="flex flex-1 items-center space-x-4">
@@ -63,7 +63,7 @@ export function NavBar() {
                 size="sm"
                 onClick={handleLogout}
               >
-                Logout
+                退出登录
               </Button>
             </>
           ) : (
@@ -72,7 +72,7 @@ export function NavBar() {
               size="sm"
               onClick={handleLogin}
             >
-              Login
+              登录
             </Button>
           )}
         </div>

@@ -18,7 +18,7 @@ export function HelloWorld() {
         const result = await getHelloWorld();
         setData(result);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch data');
+        setError(err instanceof Error ? err.message : '获取数据失败');
       }
     };
 
@@ -28,7 +28,7 @@ export function HelloWorld() {
   if (error) {
     return (
       <div className="p-4 bg-red-50 text-red-700 rounded-md">
-        Error: {error}
+        错误: {error}
       </div>
     );
   }
@@ -36,7 +36,7 @@ export function HelloWorld() {
   if (!data) {
     return (
       <div className="p-4">
-        Loading...
+        加载中...
       </div>
     );
   }
@@ -47,7 +47,7 @@ export function HelloWorld() {
         {data.message}
       </h1>
       <p className="text-sm text-gray-500">
-        Received at: {new Date(data.timestamp).toLocaleString()}
+        接收时间: {new Date(data.timestamp).toLocaleString()}
       </p>
     </div>
   );

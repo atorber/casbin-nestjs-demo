@@ -27,7 +27,7 @@ export class AuthService {
     });
 
     if (existingUser) {
-      throw new ConflictException('Username or email already exists');
+      throw new ConflictException('用户名或邮箱已存在');
     }
 
     // Hash password
@@ -55,13 +55,13 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('用户名或密码错误');
     }
 
     const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('用户名或密码错误');
     }
 
     const payload = { username: user.username, sub: user.id };
@@ -76,7 +76,7 @@ export class AuthService {
     });
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('用户不存在');
     }
 
     return plainToInstance(UserResponseDto, user);

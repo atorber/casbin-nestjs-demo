@@ -30,7 +30,7 @@ export default function LoginPage() {
       });
 
       if (!response.ok) {
-        throw new Error('Invalid credentials');
+        throw new Error('用户名或密码错误');
       }
 
       const data = await response.json();
@@ -39,8 +39,8 @@ export default function LoginPage() {
     } catch (error) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to login',
+        title: '错误',
+        description: error instanceof Error ? error.message : '登录失败',
       });
     } finally {
       setIsLoading(false);
@@ -51,29 +51,29 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center">
       <div className="w-full max-w-md space-y-8 rounded-lg border bg-card p-6 shadow-lg">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-bold">Login</h1>
+          <h1 className="text-2xl font-bold">登录</h1>
           <p className="text-sm text-muted-foreground">
-            Enter your credentials to access your account
+            请输入您的凭据以访问您的账户
           </p>
         </div>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
+            <Label htmlFor="username">用户名</Label>
             <Input
               id="username"
               type="text"
-              placeholder="Enter your username"
+              placeholder="请输入用户名"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">密码</Label>
             <Input
               id="password"
               type="password"
-              placeholder="Enter your password"
+              placeholder="请输入密码"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -84,7 +84,7 @@ export default function LoginPage() {
             className="w-full"
             disabled={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? '登录中...' : '登录'}
           </Button>
         </form>
       </div>

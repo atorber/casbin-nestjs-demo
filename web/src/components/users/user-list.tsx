@@ -41,11 +41,11 @@ export function UserList({ token }: { token: string }) {
       const data = await getAllUsers(token);
       setUsers(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch users');
+      setError(err instanceof Error ? err.message : '获取用户列表失败');
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to fetch users',
+        title: '错误',
+        description: err instanceof Error ? err.message : '获取用户列表失败',
       });
     } finally {
       setLoading(false);
@@ -60,15 +60,15 @@ export function UserList({ token }: { token: string }) {
     try {
       await deleteUser(token, user.id);
       toast({
-        title: 'Success',
-        description: `User ${user.username} has been deleted.`,
+        title: '成功',
+        description: `用户 ${user.username} 已被删除。`,
       });
       fetchUsers();
     } catch (err) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to delete user',
+        title: '错误',
+        description: err instanceof Error ? err.message : '删除用户失败',
       });
     }
   };
@@ -84,7 +84,7 @@ export function UserList({ token }: { token: string }) {
   };
 
   if (loading) {
-    return <div className="p-4">Loading users...</div>;
+    return <div className="p-4">正在加载用户...</div>;
   }
 
   if (error) {
@@ -100,11 +100,11 @@ export function UserList({ token }: { token: string }) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Username</TableHead>
-            <TableHead>Email</TableHead>
-            <TableHead>Roles</TableHead>
-            <TableHead>Status</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>用户名</TableHead>
+            <TableHead>邮箱</TableHead>
+            <TableHead>角色</TableHead>
+            <TableHead>状态</TableHead>
+            <TableHead>操作</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -113,28 +113,28 @@ export function UserList({ token }: { token: string }) {
               <TableCell>{user.username}</TableCell>
               <TableCell>{user.email}</TableCell>
               <TableCell>{user.roles.join(', ')}</TableCell>
-              <TableCell>{user.isActive ? 'Active' : 'Inactive'}</TableCell>
+              <TableCell>{user.isActive ? '激活' : '未激活'}</TableCell>
               <TableCell className="space-x-2">
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEdit(user)}
                 >
-                  Edit
+                  编辑
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => handleEditRoles(user)}
                 >
-                  Roles
+                  角色
                 </Button>
                 <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => handleDelete(user)}
                 >
-                  Delete
+                  删除
                 </Button>
               </TableCell>
             </TableRow>

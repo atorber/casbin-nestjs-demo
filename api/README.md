@@ -1,84 +1,84 @@
-# NestJS Casbin Demo API
+# NestJS Casbin 权限管理演示 API
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is a demo application showcasing the integration of NestJS and Casbin for Role-Based Access Control (RBAC). The application provides a RESTful API with OpenAPI (Swagger) documentation.
+这是一个演示应用，展示 NestJS 和 Casbin 集成实现基于角色的访问控制（RBAC）。该应用提供 RESTful API 和 OpenAPI (Swagger) 文档。
 
-## Features
+## 功能特性
 
-- 🔐 Role-Based Access Control with Casbin
-- 🔑 JWT Authentication
-- 📚 OpenAPI (Swagger) Documentation
-- ✨ Input Validation
-- 🎯 TypeScript Support
-- 🔄 Real-time Permission Updates
+- 🔐 基于 Casbin 的角色访问控制
+- 🔑 JWT 身份认证
+- 📚 OpenAPI (Swagger) 文档
+- ✨ 输入验证
+- 🎯 TypeScript 支持
+- 🔄 实时权限更新
 
-## Prerequisites
+## 前置要求
 
-- Node.js (v18.x or later)
-- npm (v10.x or later)
-- SQLite (included)
+- Node.js (v18.x 或更高版本)
+- npm (v10.x 或更高版本)
+- SQLite (已包含)
 
-## Installation
+## 安装
 
-1. Install dependencies:
+1. 安装依赖：
 ```bash
 npm install
 ```
 
-2. Copy the `.env.example` file to `.env` and update the values:
+2. 复制 `.env.example` 文件到 `.env` 并更新值：
 ```bash
 cp .env.example .env
 ```
 
-## Running the Application
+## 运行应用
 
-### Development Mode
+### 开发模式
 ```bash
 npm run start:dev
 ```
 
-### Production Mode
+### 生产模式
 ```bash
 npm run build
 npm run start:prod
 ```
 
-## API Documentation
+## API 文档
 
-Once the application is running, you can access the Swagger documentation at:
+应用运行后，您可以在以下地址访问 Swagger 文档：
 http://localhost:8000/api-docs
 
-## Available Scripts
+## 可用脚本
 
 ```bash
-# development
+# 开发
 npm run start:dev
 
-# build
+# 构建
 npm run build
 
-# production
+# 生产
 npm run start:prod
 
-# create initial users
+# 创建初始用户
 npm run create:users
 
-# run tests
+# 运行测试
 npm run test
 ```
 
-## Project Structure
+## 项目结构
 
 ```
 src/
-├── auth/              # Authentication module
-├── users/             # User management module
-├── casbinconfig/      # Casbin configuration
-├── config/            # Application configuration
-└── main.ts           # Application entry point
+├── auth/              # 认证模块
+├── users/             # 用户管理模块
+├── casbinconfig/      # Casbin 配置
+├── config/            # 应用配置
+└── main.ts           # 应用入口点
 ```
 
-## License
+## 许可证
 
-This project is licensed under the MIT License - see the [LICENSE](../LICENSE) file for details.
+本项目采用 MIT 许可证 - 详情请参阅 [LICENSE](../LICENSE) 文件。

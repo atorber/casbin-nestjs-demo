@@ -11,7 +11,7 @@ export default function UsersPage() {
     <ProtectedRoute>
       <main className="container mx-auto p-4">
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold">User Management</h1>
+          <h1 className="text-2xl font-bold">用户管理</h1>
           {token && <UserList token={token} />}
         </div>
       </main>

@@ -73,15 +73,15 @@ export function ProfileForm({ user, onCancel, onSuccess }: ProfileFormProps) {
       await updateUser(token, user.id, updateData);
       await refreshUser(); // Refresh user data after successful update
       toast({
-        title: 'Success',
-        description: 'Profile updated successfully',
+        title: '成功',
+        description: '个人资料更新成功',
       });
       onSuccess();
     } catch (err) {
       toast({
         variant: 'destructive',
-        title: 'Error',
-        description: err instanceof Error ? err.message : 'Failed to update profile',
+        title: '错误',
+        description: err instanceof Error ? err.message : '更新个人资料失败',
       });
     } finally {
       setLoading(false);
@@ -96,9 +96,9 @@ export function ProfileForm({ user, onCancel, onSuccess }: ProfileFormProps) {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>用户名</FormLabel>
               <FormControl>
-                <Input placeholder="Enter username" {...field} />
+                <Input placeholder="请输入用户名" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -109,9 +109,9 @@ export function ProfileForm({ user, onCancel, onSuccess }: ProfileFormProps) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>邮箱</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="Enter email" {...field} />
+                <Input type="email" placeholder="请输入邮箱" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,11 +122,11 @@ export function ProfileForm({ user, onCancel, onSuccess }: ProfileFormProps) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>New Password</FormLabel>
+              <FormLabel>新密码</FormLabel>
               <FormControl>
                 <Input
                   type="password"
-                  placeholder="Enter new password (optional)"
+                  placeholder="请输入新密码（可选）"
                   {...field}
                 />
               </FormControl>
@@ -141,10 +141,10 @@ export function ProfileForm({ user, onCancel, onSuccess }: ProfileFormProps) {
             onClick={onCancel}
             disabled={loading}
           >
-            Cancel
+            取消
           </Button>
           <Button type="submit" disabled={loading}>
-            {loading ? 'Saving...' : 'Save Changes'}
+            {loading ? '保存中...' : '保存更改'}
           </Button>
         </div>
       </form>

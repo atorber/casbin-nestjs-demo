@@ -18,9 +18,9 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 
 const formSchema = z.object({
-  username: z.string().min(1, { message: "Username is required" }),
+  username: z.string().min(1, { message: "用户名是必填项" }),
   password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
+    message: "密码至少需要6个字符。",
   }),
 });
 
@@ -53,7 +53,7 @@ export function LoginForm() {
       console.log('Login response:', data);
 
       if (!response.ok || !data.access_token) {
-        throw new Error(data.message || "Login failed");
+        throw new Error(data.message || "登录失败");
       }
       
       // Store the token
@@ -61,8 +61,8 @@ export function LoginForm() {
       
       // Show success message
       toast({
-        title: "Success",
-        description: "You have successfully logged in.",
+        title: "成功",
+        description: "您已成功登录。",
       });
 
       // Redirect to dashboard
@@ -70,8 +70,8 @@ export function LoginForm() {
     } catch (error) {
       console.error('Login error:', error);
       toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Invalid credentials",
+        title: "错误",
+        description: error instanceof Error ? error.message : "用户名或密码错误",
         variant: "destructive",
       });
     } finally {
@@ -87,11 +87,11 @@ export function LoginForm() {
           name="username"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Username</FormLabel>
+              <FormLabel>用户名</FormLabel>
               <FormControl>
                 <Input
                   type="text"
-                  placeholder="Enter your username"
+                  placeholder="请输入用户名"
                   {...field}
                   disabled={isLoading}
                 />
@@ -105,11 +105,11 @@ export function LoginForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>密码</FormLabel>
               <FormControl>
                 <Input
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="请输入密码"
                   {...field}
                   disabled={isLoading}
                 />
@@ -119,7 +119,7 @@ export function LoginForm() {
           )}
         />
         <Button type="submit" className="w-full" disabled={isLoading}>
-          {isLoading ? "Signing in..." : "Sign in"}
+          {isLoading ? "登录中..." : "登录"}
         </Button>
       </form>
     </Form>
