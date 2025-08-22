@@ -56,6 +56,23 @@ export default function DashboardPage() {
               </a>
             </CardContent>
           </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>存储管理</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                管理存储路径和访问权限。
+              </p>
+              <a
+                href="/storage"
+                className="mt-4 inline-block text-sm font-medium text-primary hover:underline"
+              >
+                前往存储管理 →
+              </a>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </ProtectedRoute>

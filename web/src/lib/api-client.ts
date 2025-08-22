@@ -93,4 +93,65 @@ export async function deleteUser(token: string, id: number): Promise<void> {
     },
   });
   return handleResponse<void>(response);
-} 
+}
+
+// 通用的 API 客户端对象
+export const apiClient = {
+  async get(url: string, token?: string) {
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: 'GET',
+      headers,
+    });
+    return { data: await handleResponse(response) };
+  },
+
+  async post(url: string, data?: any, token?: string) {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: 'POST',
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+    });
+    return { data: await handleResponse(response) };
+  },
+
+  async put(url: string, data?: any, token?: string) {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: 'PUT',
+      headers,
+      body: data ? JSON.stringify(data) : undefined,
+    });
+    return { data: await handleResponse(response) };
+  },
+
+  async delete(url: string, token?: string) {
+    const headers: Record<string, string> = {};
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch(`${API_BASE_URL}${url}`, {
+      method: 'DELETE',
+      headers,
+    });
+    return { data: await handleResponse(response) };
+  },
+}; 

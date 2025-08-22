@@ -12,7 +12,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, forceRefresh } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
 
@@ -34,8 +34,13 @@ export default function LoginPage() {
       }
 
       const data = await response.json();
+      console.log('登录成功，获取到 token:', data.access_token);
       login(data.access_token);
-      router.push('/dashboard');
+      // 强制刷新状态
+      setTimeout(() => {
+        forceRefresh();
+        router.push('/dashboard');
+      }, 100);
     } catch (error) {
       toast({
         variant: 'destructive',

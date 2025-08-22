@@ -6,8 +6,11 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CasbinModule } from './casbinconfig/casbin.module';
 import { User } from './users/entities/user.entity';
+import { StoragePath } from './storage/entities/storage-path.entity';
+import { StoragePermissionEntity } from './storage/entities/storage-permission.entity';
 import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
+import { StorageModule } from './storage/storage.module';
 import * as path from 'path';
 
 @Module({
@@ -20,7 +23,7 @@ import * as path from 'path';
       useFactory: (configService: ConfigService) => ({
         type: 'sqlite',
         database: path.join(__dirname, '..', '..', 'db', 'db.sqlite'),
-        entities: [User],
+        entities: [User, StoragePath, StoragePermissionEntity],
         synchronize: true, // Set to false in production
         logging: true,
       }),
@@ -29,6 +32,7 @@ import * as path from 'path';
     AuthModule,
     CasbinModule,
     UsersModule,
+    StorageModule,
   ],
   controllers: [AppController],
   providers: [AppService],

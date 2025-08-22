@@ -71,14 +71,37 @@ export class AuthService {
   }
 
   async getUserById(id: number): Promise<UserResponseDto> {
+    console.log('=== getUserById 被调用 ===');
+    console.log('传入的 ID:', id);
+    console.log('ID 类型:', typeof id);
+    
+    // 强制类型转换
+    const userId = Number(id);
+    console.log('转换后的 userId:', userId);
+    
     const user = await this.usersRepository.findOne({
-      where: { id },
+      where: { id: userId },
     });
 
     if (!user) {
+      console.log('用户不存在，ID:', userId);
       throw new NotFoundException('用户不存在');
     }
 
-    return plainToInstance(UserResponseDto, user);
+    console.log('数据库查询结果:', { 
+      id: user.id, 
+      username: user.username, 
+      roles: user.roles 
+    });
+    
+    const result = plainToInstance(UserResponseDto, user);
+    console.log('最终返回结果:', { 
+      id: result.id, 
+      username: result.username, 
+      roles: result.roles 
+    });
+    console.log('=== getUserById 结束 ===');
+    
+    return result;
   }
 } 

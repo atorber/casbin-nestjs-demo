@@ -14,6 +14,7 @@ export function NavBar() {
   const navigation = [
     { name: '仪表板', href: '/dashboard', show: !!user },
     { name: '用户管理', href: '/users', show: user?.roles.includes('admin') },
+    { name: '存储管理', href: '/storage', show: !!user },
     { name: '我的资料', href: '/profile', show: !!user },
   ];
 
@@ -23,7 +24,7 @@ export function NavBar() {
 
   const handleLogout = () => {
     logout();
-    router.push('/');
+    // logout 函数内部已经处理了路由跳转，不需要额外调用
   };
 
   return (

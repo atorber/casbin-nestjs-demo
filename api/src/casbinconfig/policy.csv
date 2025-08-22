@@ -2,6 +2,9 @@ p, admin, users, read
 p, admin, users, write
 p, admin, users, delete
 p, admin, roles, write
+p, admin, storage, read
+p, admin, storage, write
 p, user, own_user, read
 p, user, own_user, write
+p, user, storage, read
 g, admin, user 
