@@ -10,7 +10,7 @@ import { CasbinGuard } from '../casbinconfig/guards/casbin-auth.guard';
 
 describe('AuthController', () => {
   let controller: AuthController;
-  let service: AuthService;
+  // let service: AuthService;
 
   const mockAuthService = {
     register: jest.fn(),
@@ -34,7 +34,7 @@ describe('AuthController', () => {
       .compile();
 
     controller = module.get<AuthController>(AuthController);
-    service = module.get<AuthService>(AuthService);
+    // service = module.get<AuthService>(AuthService);
   });
 
   afterEach(() => {
@@ -65,7 +65,7 @@ describe('AuthController', () => {
       const result = await controller.register(registerDto);
 
       expect(result).toEqual(mockUser);
-      expect(service.register).toHaveBeenCalledWith(registerDto);
+      expect(mockAuthService.register).toHaveBeenCalledWith(registerDto);
     });
 
     it('should handle registration errors', async () => {
@@ -104,7 +104,7 @@ describe('AuthController', () => {
       const result = await controller.login(loginDto);
 
       expect(result).toEqual(mockLoginResponse);
-      expect(service.login).toHaveBeenCalledWith(loginDto);
+      expect(mockAuthService.login).toHaveBeenCalledWith(loginDto);
     });
 
     it('should handle login errors', async () => {

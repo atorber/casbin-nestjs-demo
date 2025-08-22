@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+// import { Repository } from 'typeorm';
 import { StorageService } from './storage.service';
 import {
   StorageInstance,
@@ -17,10 +17,10 @@ import { NotFoundException, ConflictException } from '@nestjs/common';
 
 describe('StorageService', () => {
   let service: StorageService;
-  let storageInstanceRepository: Repository<StorageInstance>;
-  let storagePathRepository: Repository<StoragePath>;
-  let storagePermissionRepository: Repository<StoragePermissionEntity>;
-  let userRepository: Repository<User>;
+  // let storageInstanceRepository: Repository<StorageInstance>;
+  // let storagePathRepository: Repository<StoragePath>;
+  // let storagePermissionRepository: Repository<StoragePermissionEntity>;
+  // let userRepository: Repository<User>;
 
   const mockStorageInstanceRepository = {
     create: jest.fn(),
@@ -78,16 +78,16 @@ describe('StorageService', () => {
     }).compile();
 
     service = module.get<StorageService>(StorageService);
-    storageInstanceRepository = module.get<Repository<StorageInstance>>(
-      getRepositoryToken(StorageInstance),
-    );
-    storagePathRepository = module.get<Repository<StoragePath>>(
-      getRepositoryToken(StoragePath),
-    );
-    storagePermissionRepository = module.get<
-      Repository<StoragePermissionEntity>
-    >(getRepositoryToken(StoragePermissionEntity));
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    // storageInstanceRepository = module.get<Repository<StorageInstance>>(
+    //   getRepositoryToken(StorageInstance),
+    // );
+    // storagePathRepository = module.get<Repository<StoragePath>>(
+    //   getRepositoryToken(StoragePath),
+    // );
+    // storagePermissionRepository = module.get<
+    //   Repository<StoragePermissionEntity>
+    // >(getRepositoryToken(StoragePermissionEntity));
+    // userRepository = module.get<Repository<User>>(getRepositoryToken(User));
   });
 
   afterEach(() => {

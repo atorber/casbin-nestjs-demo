@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { JwtService } from '@nestjs/jwt';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+// import { Repository } from 'typeorm';
 import { AuthService } from './auth.service';
 import { User } from '../users/entities/user.entity';
 import { LoginDto } from './dto/login.dto';
@@ -11,8 +11,8 @@ import * as bcrypt from 'bcrypt';
 
 describe('AuthService', () => {
   let service: AuthService;
-  let userRepository: Repository<User>;
-  let jwtService: JwtService;
+  // let userRepository: Repository<User>;
+  // let jwtService: JwtService;
 
   const mockUserRepository = {
     create: jest.fn(),
@@ -40,8 +40,8 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
-    userRepository = module.get<Repository<User>>(getRepositoryToken(User));
-    jwtService = module.get<JwtService>(JwtService);
+    // userRepository = module.get<Repository<User>>(getRepositoryToken(User));
+    // jwtService = module.get<JwtService>(JwtService);
   });
 
   afterEach(() => {
@@ -129,7 +129,7 @@ describe('AuthService', () => {
         loginDto.password,
         mockUser.password,
       );
-      expect(jwtService.signAsync).toHaveBeenCalledWith({
+      expect(mockJwtService.signAsync).toHaveBeenCalledWith({
         username: mockUser.username,
         sub: mockUser.id,
       });

@@ -17,7 +17,7 @@ import { CasbinGuard } from '../casbinconfig/guards/casbin-auth.guard';
 
 describe('StorageController', () => {
   let controller: StorageController;
-  let service: StorageService;
+  // let service: StorageService;
 
   const mockStorageService = {
     createStorageInstance: jest.fn(),
@@ -52,7 +52,7 @@ describe('StorageController', () => {
       .compile();
 
     controller = module.get<StorageController>(StorageController);
-    service = module.get<StorageService>(StorageService);
+    // service = module.get<StorageService>(StorageService);
   });
 
   afterEach(() => {
@@ -85,7 +85,10 @@ describe('StorageController', () => {
       } as any);
 
       expect(result).toEqual(mockInstance);
-      expect(service.createStorageInstance).toHaveBeenCalledWith(createDto, 1);
+      expect(mockStorageService.createStorageInstance).toHaveBeenCalledWith(
+        createDto,
+        1,
+      );
     });
   });
 
@@ -126,7 +129,7 @@ describe('StorageController', () => {
       const result = await controller.getAllStorageInstances();
 
       expect(result).toEqual(mockInstances);
-      expect(service.getAllStorageInstances).toHaveBeenCalled();
+      expect(mockStorageService.getAllStorageInstances).toHaveBeenCalled();
     });
   });
 
@@ -150,7 +153,7 @@ describe('StorageController', () => {
       const result = await controller.getStorageInstanceById(1);
 
       expect(result).toEqual(mockInstance);
-      expect(service.getStorageInstanceById).toHaveBeenCalledWith(1);
+      expect(mockStorageService.getStorageInstanceById).toHaveBeenCalledWith(1);
     });
 
     it('should throw NotFoundException when instance not found', async () => {
@@ -170,7 +173,7 @@ describe('StorageController', () => {
 
       await controller.deleteStorageInstance(1);
 
-      expect(service.deleteStorageInstance).toHaveBeenCalledWith(1);
+      expect(mockStorageService.deleteStorageInstance).toHaveBeenCalledWith(1);
     });
   });
 
@@ -200,7 +203,10 @@ describe('StorageController', () => {
       } as any);
 
       expect(result).toEqual(mockPath);
-      expect(service.createStoragePath).toHaveBeenCalledWith(createDto, 1);
+      expect(mockStorageService.createStoragePath).toHaveBeenCalledWith(
+        createDto,
+        1,
+      );
     });
   });
 
@@ -239,7 +245,7 @@ describe('StorageController', () => {
       const result = await controller.getAllStoragePaths();
 
       expect(result).toEqual(mockPaths);
-      expect(service.getAllStoragePaths).toHaveBeenCalled();
+      expect(mockStorageService.getAllStoragePaths).toHaveBeenCalled();
     });
   });
 
@@ -263,7 +269,7 @@ describe('StorageController', () => {
       const result = await controller.getStoragePathById(1);
 
       expect(result).toEqual(mockPath);
-      expect(service.getStoragePathById).toHaveBeenCalledWith(1);
+      expect(mockStorageService.getStoragePathById).toHaveBeenCalledWith(1);
     });
   });
 
@@ -273,7 +279,7 @@ describe('StorageController', () => {
 
       await controller.deleteStoragePath(1);
 
-      expect(service.deleteStoragePath).toHaveBeenCalledWith(1);
+      expect(mockStorageService.deleteStoragePath).toHaveBeenCalledWith(1);
     });
   });
 
@@ -310,7 +316,7 @@ describe('StorageController', () => {
       const result = await controller.grantPermission(grantDto);
 
       expect(result).toEqual(mockPermissions);
-      expect(service.grantPermission).toHaveBeenCalledWith(grantDto);
+      expect(mockStorageService.grantPermission).toHaveBeenCalledWith(grantDto);
     });
 
     it('should handle service errors properly', async () => {
@@ -330,7 +336,7 @@ describe('StorageController', () => {
 
       await controller.revokePermission(1, 1);
 
-      expect(service.revokePermission).toHaveBeenCalledWith(1, 1);
+      expect(mockStorageService.revokePermission).toHaveBeenCalledWith(1, 1);
     });
   });
 
@@ -341,7 +347,7 @@ describe('StorageController', () => {
 
       await controller.revokeMultiplePermissions(body);
 
-      expect(service.revokeMultiplePermissions).toHaveBeenCalledWith(
+      expect(mockStorageService.revokeMultiplePermissions).toHaveBeenCalledWith(
         body.userIds,
         body.storagePathId,
       );
@@ -368,7 +374,7 @@ describe('StorageController', () => {
       const result = await controller.getAllStoragePermissions();
 
       expect(result).toEqual(mockPermissions);
-      expect(service.getAllStoragePermissions).toHaveBeenCalled();
+      expect(mockStorageService.getAllStoragePermissions).toHaveBeenCalled();
     });
   });
 
@@ -395,7 +401,9 @@ describe('StorageController', () => {
       );
 
       expect(result).toEqual(mockPermissions);
-      expect(service.getUserStoragePermissions).toHaveBeenCalledWith(1);
+      expect(mockStorageService.getUserStoragePermissions).toHaveBeenCalledWith(
+        1,
+      );
     });
 
     it('should throw error when user id is not available', async () => {

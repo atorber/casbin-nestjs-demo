@@ -10,7 +10,7 @@ import { CasbinGuard } from '../casbinconfig/guards/casbin-auth.guard';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let service: UsersService;
+  // let service: UsersService;
 
   const mockUsersService = {
     findAll: jest.fn(),
@@ -41,7 +41,7 @@ describe('UsersController', () => {
       .compile();
 
     controller = module.get<UsersController>(UsersController);
-    service = module.get<UsersService>(UsersService);
+    // service = module.get<UsersService>(UsersService);
   });
 
   afterEach(() => {
@@ -78,7 +78,7 @@ describe('UsersController', () => {
       const result = await controller.findAll();
 
       expect(result).toEqual(mockUsers);
-      expect(service.findAll).toHaveBeenCalled();
+      expect(mockUsersService.findAll).toHaveBeenCalled();
     });
   });
 
@@ -100,7 +100,7 @@ describe('UsersController', () => {
       const result = await controller.findOne(1);
 
       expect(result).toEqual(mockUser);
-      expect(service.findOne).toHaveBeenCalledWith(1);
+      expect(mockUsersService.findOne).toHaveBeenCalledWith(1);
     });
 
     it('should handle user not found', async () => {
@@ -137,7 +137,7 @@ describe('UsersController', () => {
       const result = await controller.update(1, updateUserDto);
 
       expect(result).toEqual(updatedUser);
-      expect(service.update).toHaveBeenCalledWith(1, updateUserDto);
+      expect(mockUsersService.update).toHaveBeenCalledWith(1, updateUserDto);
     });
   });
 
@@ -165,7 +165,10 @@ describe('UsersController', () => {
       const result = await controller.updateRoles(1, updateRolesDto);
 
       expect(result).toEqual(updatedUser);
-      expect(service.updateRoles).toHaveBeenCalledWith(1, updateRolesDto);
+      expect(mockUsersService.updateRoles).toHaveBeenCalledWith(
+        1,
+        updateRolesDto,
+      );
     });
   });
 
@@ -175,7 +178,7 @@ describe('UsersController', () => {
 
       await controller.remove(1);
 
-      expect(service.remove).toHaveBeenCalledWith(1);
+      expect(mockUsersService.remove).toHaveBeenCalledWith(1);
     });
   });
 });
