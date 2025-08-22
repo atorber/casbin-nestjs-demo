@@ -1,5 +1,19 @@
-import { Controller, Get, Put, Delete, Param, Body, UseGuards, ParseIntPipe, ForbiddenException } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  Controller,
+  Get,
+  Put,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  ParseIntPipe,
+} from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -7,7 +21,6 @@ import { UpdateUserRolesDto } from './dto/update-user-roles.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CasbinGuard } from '../casbinconfig/guards/casbin-auth.guard';
 import { RequirePermissions } from '../casbinconfig/decorators/permissions.decorator';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
 
 @ApiTags('用户管理')
 @Controller('users')
@@ -70,4 +83,4 @@ export class UsersController {
   async remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
     return this.usersService.remove(id);
   }
-} 
+}

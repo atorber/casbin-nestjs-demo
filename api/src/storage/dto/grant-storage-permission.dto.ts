@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNumber, IsEnum, IsNotEmpty } from 'class-validator';
-import { StoragePermission } from '../entities/storage-path.entity';
+import { StoragePermission } from '../entities/storage-permission.enum';
 
 export class GrantStoragePermissionDto {
   @ApiProperty({ example: 1, description: '用户ID' })
@@ -13,10 +13,10 @@ export class GrantStoragePermissionDto {
   @IsNotEmpty()
   storagePathId: number;
 
-  @ApiProperty({ 
-    enum: StoragePermission, 
-    example: StoragePermission.READ, 
-    description: '权限类型：只读或读写' 
+  @ApiProperty({
+    enum: StoragePermission,
+    example: StoragePermission.READ,
+    description: '权限类型：只读或读写',
   })
   @IsEnum(StoragePermission)
   @IsNotEmpty()

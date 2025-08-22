@@ -35,7 +35,7 @@ export class CasbinGuard implements CanActivate {
     const paramId = request.params.id;
     if (paramId && object === 'users') {
       // If accessing own user data
-      if (parseInt(paramId) === user.userId) {
+      if (parseInt(paramId as string) === user.userId) {
         return this.casbinService.checkPermission(
           user.username,
           'own_user',
@@ -45,10 +45,6 @@ export class CasbinGuard implements CanActivate {
     }
 
     // For all other cases, check regular permissions
-    return this.casbinService.checkPermission(
-      user.username,
-      object,
-      action,
-    );
+    return this.casbinService.checkPermission(user.username, object, action);
   }
-} 
+}

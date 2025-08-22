@@ -1,0 +1,26 @@
+/* 存储管理页面Tab样式 */
+
+/* Tab容器样式 */
+.storage-tabs {
+  @apply w-full;
+}
+
+/* Tab列表样式 */
+.storage-tabs-list {
+  @apply inline-flex h-10 items-center justify-center rounded-md bg-gray-100 p-1 text-gray-500 mb-6;
+}
+
+/* Tab触发器样式 */
+.storage-tabs-trigger {
+  @apply inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium;
+  @apply ring-offset-white transition-all;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+  @apply disabled:pointer-events-none disabled:opacity-50;
+  @apply data-[state=active]:bg-white data-[state=active]:text-gray-950 data-[state=active]:shadow-sm;
+}
+
+/* Tab内容样式 */
+.storage-tabs-content {
+  @apply mt-6;
+  @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2;
+}

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { CasbinModule } from './casbinconfig/casbin.module';
 import { User } from './users/entities/user.entity';
 import { StoragePath } from './storage/entities/storage-path.entity';
+import { StorageInstance } from './storage/entities/storage-instance.entity';
 import { StoragePermissionEntity } from './storage/entities/storage-permission.entity';
 import configuration from './config/configuration';
 import { UsersModule } from './users/users.module';
@@ -20,14 +21,14 @@ import * as path from 'path';
       load: [configuration],
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (configService: ConfigService) => ({
+      useFactory: () => ({
         type: 'sqlite',
         database: path.join(__dirname, '..', '..', 'db', 'db.sqlite'),
-        entities: [User, StoragePath, StoragePermissionEntity],
-        synchronize: true, // Set to false in production
+        entities: [User, StoragePath, StorageInstance, StoragePermissionEntity],
+        synchronize: false, // Temporarily disabled for migration
         logging: true,
       }),
-      inject: [ConfigService],
+      inject: [],
     }),
     AuthModule,
     CasbinModule,

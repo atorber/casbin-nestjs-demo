@@ -66,7 +66,7 @@ export function StoragePermissionDialog({
     
     try {
       const response = await apiClient.get('/users', token);
-      setUsers(response.data);
+      setUsers(response.data as User[]);
     } catch (error) {
       toast({
         title: '错误',

@@ -41,7 +41,7 @@ async function bootstrap() {
 
       if (!user) {
         // Create new user if doesn't exist
-        const result = await authService.register(userData);
+        await authService.register(userData);
         console.log(`用户 ${userData.username} 创建成功`);
         user = await userRepository.findOne({
           where: { username: userData.username },
@@ -54,7 +54,9 @@ async function bootstrap() {
       }
 
       // Remove existing roles from Casbin
-      const existingRoles = await casbinService.getRolesForUser(userData.username);
+      const existingRoles = await casbinService.getRolesForUser(
+        userData.username,
+      );
       for (const role of existingRoles) {
         await casbinService.removeRoleForUser(userData.username, role);
       }
@@ -72,4 +74,4 @@ async function bootstrap() {
   await app.close();
 }
 
-bootstrap(); 
+void bootstrap();

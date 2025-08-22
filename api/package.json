@@ -20,7 +20,8 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "create:users": "ts-node src/scripts/create-users.ts",
-    "create:storage": "ts-node src/scripts/create-storage-data.ts"
+    "create:storage": "ts-node src/scripts/create-storage-data.ts",
+    "create:instances": "ts-node src/scripts/create-storage-instances.ts"
   },
   "dependencies": {
     "@nestjs/common": "^9.4.3",
@@ -66,7 +67,8 @@
     "ts-loader": "^9.5.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
-    "typescript": "^4.9.5"
+    "typescript": "^4.9.5",
+    "typescript-eslint": "^8.40.0"
   },
   "jest": {
     "moduleFileExtensions": [

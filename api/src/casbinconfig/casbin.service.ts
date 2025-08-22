@@ -1,11 +1,11 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import { newEnforcer } from 'casbin';
+import { newEnforcer, Enforcer } from 'casbin';
 import * as path from 'path';
 import * as fs from 'fs';
 
 @Injectable()
 export class CasbinService implements OnModuleInit {
-  private enforcer: any;
+  private enforcer: Enforcer;
 
   async onModuleInit() {
     // Try to find the config files in both development and production paths
@@ -15,7 +15,12 @@ export class CasbinService implements OnModuleInit {
 
     if (isDevelopment) {
       modelPath = path.join(process.cwd(), 'src', 'casbinconfig', 'model.conf');
-      policyPath = path.join(process.cwd(), 'src', 'casbinconfig', 'policy.csv');
+      policyPath = path.join(
+        process.cwd(),
+        'src',
+        'casbinconfig',
+        'policy.csv',
+      );
     } else {
       modelPath = path.join(__dirname, 'model.conf');
       policyPath = path.join(__dirname, 'policy.csv');
@@ -33,7 +38,7 @@ export class CasbinService implements OnModuleInit {
     this.enforcer = await newEnforcer(modelPath, policyPath);
   }
 
-  async checkPermission(
+  checkPermission(
     subject: string,
     object: string,
     action: string,
@@ -41,31 +46,35 @@ export class CasbinService implements OnModuleInit {
     return this.enforcer.enforce(subject, object, action);
   }
 
-  async addPolicy(subject: string, object: string, action: string): Promise<boolean> {
+  addPolicy(subject: string, object: string, action: string): Promise<boolean> {
     return this.enforcer.addPolicy(subject, object, action);
   }
 
-  async removePolicy(subject: string, object: string, action: string): Promise<boolean> {
+  removePolicy(
+    subject: string,
+    object: string,
+    action: string,
+  ): Promise<boolean> {
     return this.enforcer.removePolicy(subject, object, action);
   }
 
-  async addRoleForUser(user: string, role: string): Promise<boolean> {
+  addRoleForUser(user: string, role: string): Promise<boolean> {
     return this.enforcer.addGroupingPolicy(user, role);
   }
 
-  async removeRoleForUser(user: string, role: string): Promise<boolean> {
+  removeRoleForUser(user: string, role: string): Promise<boolean> {
     return this.enforcer.removeGroupingPolicy(user, role);
   }
 
-  async getRolesForUser(user: string): Promise<string[]> {
+  getRolesForUser(user: string): Promise<string[]> {
     return this.enforcer.getRolesForUser(user);
   }
 
-  async getUsersForRole(role: string): Promise<string[]> {
+  getUsersForRole(role: string): Promise<string[]> {
     return this.enforcer.getUsersForRole(role);
   }
 
-  async hasRoleForUser(user: string, role: string): Promise<boolean> {
+  hasRoleForUser(user: string, role: string): Promise<boolean> {
     return this.enforcer.hasRoleForUser(user, role);
   }
-} 
+}

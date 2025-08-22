@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  UnauthorizedException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -17,13 +22,12 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async register(registerDto: RegisterDto & { roles?: string[] }): Promise<{ access_token: string }> {
+  async register(
+    registerDto: RegisterDto & { roles?: string[] },
+  ): Promise<{ access_token: string }> {
     // Check if user exists
     const existingUser = await this.usersRepository.findOne({
-      where: [
-        { username: registerDto.username },
-        { email: registerDto.email },
-      ],
+      where: [{ username: registerDto.username }, { email: registerDto.email }],
     });
 
     if (existingUser) {
@@ -58,7 +62,10 @@ export class AuthService {
       throw new UnauthorizedException('用户名或密码错误');
     }
 
-    const isPasswordValid = await bcrypt.compare(loginDto.password, user.password);
+    const isPasswordValid = await bcrypt.compare(
+      loginDto.password,
+      user.password,
+    );
 
     if (!isPasswordValid) {
       throw new UnauthorizedException('用户名或密码错误');
@@ -74,11 +81,11 @@ export class AuthService {
     console.log('=== getUserById 被调用 ===');
     console.log('传入的 ID:', id);
     console.log('ID 类型:', typeof id);
-    
+
     // 强制类型转换
     const userId = Number(id);
     console.log('转换后的 userId:', userId);
-    
+
     const user = await this.usersRepository.findOne({
       where: { id: userId },
     });
@@ -88,20 +95,20 @@ export class AuthService {
       throw new NotFoundException('用户不存在');
     }
 
-    console.log('数据库查询结果:', { 
-      id: user.id, 
-      username: user.username, 
-      roles: user.roles 
+    console.log('数据库查询结果:', {
+      id: user.id,
+      username: user.username,
+      roles: user.roles,
     });
-    
+
     const result = plainToInstance(UserResponseDto, user);
-    console.log('最终返回结果:', { 
-      id: result.id, 
-      username: result.username, 
-      roles: result.roles 
+    console.log('最终返回结果:', {
+      id: result.id,
+      username: result.username,
+      roles: result.roles,
     });
     console.log('=== getUserById 结束 ===');
-    
+
     return result;
   }
-} 
+}

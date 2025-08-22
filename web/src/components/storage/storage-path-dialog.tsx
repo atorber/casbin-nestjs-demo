@@ -9,6 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
@@ -16,15 +17,23 @@ import { useAuth } from '@/contexts/auth-context';
 const formSchema = z.object({
   path: z.string().min(1, { message: '存储路径是必填项' }),
   description: z.string().optional(),
+  storageInstanceId: z.number().min(1, { message: '请选择对象存储实例' }),
 });
+
+interface StorageInstance {
+  id: number;
+  name: string;
+  type: string;
+}
 
 interface StoragePathDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (storagePath: any) => void;
+  storageInstances?: StorageInstance[];
 }
 
-export function StoragePathDialog({ open, onOpenChange, onSuccess }: StoragePathDialogProps) {
+export function StoragePathDialog({ open, onOpenChange, onSuccess, storageInstances = [] }: StoragePathDialogProps) {
   const { toast } = useToast();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -34,6 +43,7 @@ export function StoragePathDialog({ open, onOpenChange, onSuccess }: StoragePath
     defaultValues: {
       path: '',
       description: '',
+      storageInstanceId: 0,
     },
   });
 
@@ -71,6 +81,31 @@ export function StoragePathDialog({ open, onOpenChange, onSuccess }: StoragePath
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="storageInstanceId"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>对象存储实例</FormLabel>
+                  <Select onValueChange={(value) => field.onChange(Number(value))} value={field.value?.toString()}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="选择对象存储实例" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      {storageInstances.map((instance) => (
+                        <SelectItem key={instance.id} value={instance.id.toString()}>
+                          {instance.name} ({instance.type})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="path"

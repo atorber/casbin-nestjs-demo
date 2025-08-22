@@ -38,9 +38,12 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async updateRoles(id: number, updateUserRolesDto: UpdateUserRolesDto): Promise<User> {
+  async updateRoles(
+    id: number,
+    updateUserRolesDto: UpdateUserRolesDto,
+  ): Promise<User> {
     const user = await this.findOne(id);
-    
+
     // Remove old roles from Casbin
     for (const role of user.roles) {
       await this.casbinService.removeRoleForUser(user.username, role);
@@ -57,7 +60,7 @@ export class UsersService {
 
   async remove(id: number): Promise<void> {
     const user = await this.findOne(id);
-    
+
     // Remove all roles from Casbin
     for (const role of user.roles) {
       await this.casbinService.removeRoleForUser(user.username, role);
@@ -65,4 +68,4 @@ export class UsersService {
 
     await this.usersRepository.remove(user);
   }
-} 
+}

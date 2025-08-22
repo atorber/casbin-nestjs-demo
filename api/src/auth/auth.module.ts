@@ -28,4 +28,4 @@ import { CasbinModule } from '../casbinconfig/casbin.module';
   providers: [AuthService, JwtStrategy],
   exports: [AuthService],
 })
-export class AuthModule {} 
+export class AuthModule {}

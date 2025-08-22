@@ -1,26 +1,42 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn,
+  OneToMany,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-
-export enum StoragePermission {
-  READ = 'read',
-  WRITE = 'write'
-}
+import { StorageInstance } from './storage-instance.entity';
+import { StoragePermissionEntity } from './storage-permission.entity';
 
 @Entity('storage_paths')
 export class StoragePath {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ unique: true })
+  @Column({ length: 500 })
   path: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string;
+
+  @Column({ default: true })
+  isActive: boolean;
+
+  @Column()
+  storageInstanceId: number;
+
+  @ManyToOne(() => StorageInstance, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'storageInstanceId' })
+  storageInstance: StorageInstance;
 
   @Column()
   createdById: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'createdById' })
   createdBy: User;
 
@@ -29,4 +45,10 @@ export class StoragePath {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @OneToMany(
+    () => StoragePermissionEntity,
+    (permission) => permission.storagePath,
+  )
+  permissions: StoragePermissionEntity[];
 }

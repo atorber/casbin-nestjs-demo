@@ -1,5 +1,10 @@
 import { Controller, Post, Get, Body, UseGuards } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
@@ -36,14 +41,20 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: '获取当前用户详情' })
-  @ApiResponse({ status: 200, description: '返回当前用户详情', type: UserResponseDto })
+  @ApiResponse({
+    status: 200,
+    description: '返回当前用户详情',
+    type: UserResponseDto,
+  })
   @ApiResponse({ status: 401, description: '未授权' })
-  async getCurrentUser(@CurrentUser() user: { userId: number; id: number; username: string }) {
+  async getCurrentUser(
+    @CurrentUser() user: { userId: number; id: number; username: string },
+  ) {
     console.log('getCurrentUser 被调用，user 对象:', user);
     console.log('使用的 userId:', user.userId);
     console.log('使用的 id:', user.id);
     console.log('用户名:', user.username);
-    
+
     return this.authService.getUserById(user.userId);
   }
-} 
+}

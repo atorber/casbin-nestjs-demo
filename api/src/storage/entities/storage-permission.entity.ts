@@ -1,6 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  Unique,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { StoragePath, StoragePermission } from './storage-path.entity';
+import { StoragePath } from './storage-path.entity';
+import { StoragePermission } from './storage-permission.enum';
 
 @Entity('storage_permissions')
 @Unique(['userId', 'storagePathId'])
@@ -25,7 +33,7 @@ export class StoragePermissionEntity {
   @Column({
     type: 'varchar',
     enum: StoragePermission,
-    default: StoragePermission.READ
+    default: StoragePermission.READ,
   })
   permission: StoragePermission;
 

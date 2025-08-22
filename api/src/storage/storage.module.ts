@@ -3,12 +3,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { StorageController } from './storage.controller';
 import { StorageService } from './storage.service';
 import { StoragePath } from './entities/storage-path.entity';
+import { StorageInstance } from './entities/storage-instance.entity';
 import { StoragePermissionEntity } from './entities/storage-permission.entity';
 import { User } from '../users/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([StoragePath, StoragePermissionEntity, User]),
+    TypeOrmModule.forFeature([
+      StoragePath,
+      StorageInstance,
+      StoragePermissionEntity,
+      User,
+    ]),
   ],
   controllers: [StorageController],
   providers: [StorageService],

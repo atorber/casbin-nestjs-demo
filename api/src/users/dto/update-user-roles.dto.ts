@@ -6,4 +6,4 @@ export class UpdateUserRolesDto {
   @IsArray()
   @IsString({ each: true })
   roles: string[];
-} 
+}

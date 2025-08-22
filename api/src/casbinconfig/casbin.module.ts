@@ -6,4 +6,4 @@ import { CasbinService } from './casbin.service';
   providers: [CasbinService],
   exports: [CasbinService],
 })
-export class CasbinModule {} 
+export class CasbinModule {}

@@ -8,4 +8,4 @@ export const PERMISSIONS_KEY = 'permissions';
  * @param action 执行的操作（例如：'read', 'write', 'delete'）
  */
 export const RequirePermissions = (object: string, action: string) =>
-  SetMetadata(PERMISSIONS_KEY, [object, action]); 
+  SetMetadata(PERMISSIONS_KEY, [object, action]);

@@ -1,4 +1,10 @@
-import { IsString, IsEmail, IsOptional, MinLength, Matches } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  IsOptional,
+  MinLength,
+  Matches,
+} from 'class-validator';
 import { ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateUserDto {
@@ -21,4 +27,4 @@ export class UpdateUserDto {
     message: '密码必须包含大写字母、小写字母、数字或特殊字符',
   })
   password?: string;
-} 
+}

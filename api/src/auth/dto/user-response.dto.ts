@@ -29,4 +29,4 @@ export class UserResponseDto {
   @Expose()
   @ApiProperty()
   updatedAt: Date;
-} 
+}

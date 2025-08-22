@@ -6,12 +6,9 @@ import { User } from './entities/user.entity';
 import { CasbinModule } from '../casbinconfig/casbin.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([User]),
-    CasbinModule,
-  ],
+  imports: [TypeOrmModule.forFeature([User]), CasbinModule],
   controllers: [UsersController],
   providers: [UsersService],
   exports: [UsersService],
 })
-export class UsersModule {} 
+export class UsersModule {}
