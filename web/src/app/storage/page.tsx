@@ -53,6 +53,7 @@ interface StoragePermission {
   user: {
     id: number;
     username: string;
+    email?: string;
   };
   storagePath: {
     id: number;
@@ -421,21 +422,56 @@ export default function StoragePage() {
                           className="rounded border-gray-300"
                         />
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className="font-medium text-lg">
-                              {permission.user?.username || `用户ID: ${permission.userId}`}
+                          {/* 用户信息和权限类型 */}
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="flex items-center gap-2">
+                              <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                                <span className="text-sm font-medium text-blue-600">
+                                  {permission.user?.username?.charAt(0).toUpperCase() || 'U'}
+                                </span>
+                              </div>
+                              <div>
+                                <div className="font-medium text-lg">
+                                  {permission.user?.username || `用户ID: ${permission.userId}`}
+                                </div>
+                                {permission.user?.email && (
+                                  <div className="text-sm text-muted-foreground">
+                                    {permission.user.email}
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <Badge variant={permission.permission === 'write' ? 'default' : 'secondary'}>
-                              {permission.permission === 'write' ? '读写' : '只读'}
+                            <Badge 
+                              variant={permission.permission === 'write' ? 'default' : 'secondary'}
+                              className="ml-2"
+                            >
+                              {permission.permission === 'write' ? '读写权限' : '只读权限'}
                             </Badge>
                           </div>
-                          <div className="text-sm text-muted-foreground">
-                            <span className="font-medium">存储路径:</span> {permission.storagePath?.path || `路径ID: ${permission.storagePathId}`}
+                          
+                          {/* 存储路径信息 */}
+                          <div className="bg-gray-50 rounded-md p-3 mb-3">
+                            <div className="text-sm">
+                              <span className="font-medium text-gray-700">存储路径:</span>
+                              <span className="ml-2 font-mono text-gray-800">
+                                {permission.storagePath?.path || `路径ID: ${permission.storagePathId}`}
+                              </span>
+                            </div>
+                            {permission.storagePath?.description && (
+                              <div className="text-sm text-gray-600 mt-1">
+                                {permission.storagePath.description}
+                              </div>
+                            )}
                           </div>
+                          
+                          {/* 存储实例信息 */}
                           {permission.storagePath?.storageInstance && (
-                            <div className="text-sm text-muted-foreground">
-                              <span className="font-medium">存储实例:</span> {permission.storagePath.storageInstance.name} 
-                              <Badge variant="outline" className="ml-2 text-xs">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-sm font-medium text-gray-700">存储实例:</span>
+                              <span className="text-sm text-gray-800">
+                                {permission.storagePath.storageInstance.name}
+                              </span>
+                              <Badge variant="outline" className="text-xs">
                                 {permission.storagePath.storageInstance.type === 'local' ? '本地存储' : 
                                  permission.storagePath.storageInstance.type === 's3' ? 'Amazon S3' :
                                  permission.storagePath.storageInstance.type === 'minio' ? 'MinIO' :
@@ -445,19 +481,25 @@ export default function StoragePage() {
                               </Badge>
                             </div>
                           )}
-                          <div className="text-xs text-muted-foreground mt-1">
-                            授予时间: {new Date(permission.grantedAt).toLocaleString()}
+                          
+                          {/* 时间信息 */}
+                          <div className="text-xs text-muted-foreground">
+                            <span className="font-medium">权限授予时间:</span> {new Date(permission.grantedAt).toLocaleString()}
                           </div>
                         </div>
                       </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => handlePermissionRevoked(permission.userId, permission.storagePathId)}
-                        className="ml-4"
-                      >
-                        撤销权限
-                      </Button>
+                      
+                      {/* 操作按钮 */}
+                      <div className="flex flex-col gap-2 ml-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handlePermissionRevoked(permission.userId, permission.storagePathId)}
+                          className="whitespace-nowrap"
+                        >
+                          撤销权限
+                        </Button>
+                      </div>
                     </div>
                   ))
                 )}

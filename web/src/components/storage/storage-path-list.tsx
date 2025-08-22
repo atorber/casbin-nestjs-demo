@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
+import { StoragePermissionDialog } from './storage-permission-dialog';
 
 interface StorageInstance {
   id: number;
@@ -37,6 +38,8 @@ export function StoragePathList({ storagePaths, onDelete, isAdmin }: StoragePath
   const { toast } = useToast();
   const { token } = useAuth();
   const [deletingIds, setDeletingIds] = useState<Set<number>>(new Set());
+  const [permissionDialogOpen, setPermissionDialogOpen] = useState(false);
+  const [selectedPathId, setSelectedPathId] = useState<number | null>(null);
 
   // 添加调试日志
   console.log('StoragePathList 接收到的数据:', storagePaths);
@@ -68,6 +71,20 @@ export function StoragePathList({ storagePaths, onDelete, isAdmin }: StoragePath
     }
   };
 
+  const handleGrantPermission = (pathId: number) => {
+    setSelectedPathId(pathId);
+    setPermissionDialogOpen(true);
+  };
+
+  const handlePermissionGranted = () => {
+    setPermissionDialogOpen(false);
+    setSelectedPathId(null);
+    toast({
+      title: '成功',
+      description: '权限授予成功',
+    });
+  };
+
   const getStorageInstanceTypeLabel = (type: string) => {
     const typeLabels: Record<string, string> = {
       local: '本地存储',
@@ -89,61 +106,80 @@ export function StoragePathList({ storagePaths, onDelete, isAdmin }: StoragePath
   }
 
   return (
-    <div className="space-y-3">
-      {storagePaths.map((path) => (
-        <div key={path.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
-          <div className="flex-1">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="font-medium text-lg">{path.path}</div>
-              {path.storageInstance && (
-                <Badge variant="secondary" className="text-xs">
-                  {path.storageInstance.name}
-                </Badge>
-              )}
-            </div>
-            
-            {path.description && (
-              <div className="text-sm text-muted-foreground mb-2">{path.description}</div>
-            )}
-            
-            <div className="flex items-center gap-3 text-xs text-muted-foreground">
-              {path.storageInstance && (
-                <div className="flex items-center gap-1">
-                  <span className="font-medium">存储实例:</span>
-                  <Badge variant="outline" className="text-xs">
-                    {getStorageInstanceTypeLabel(path.storageInstance.type)}
+    <>
+      <div className="space-y-3">
+        {storagePaths.map((path) => (
+          <div key={path.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="font-medium text-lg">{path.path}</div>
+                {path.storageInstance && (
+                  <Badge variant="secondary" className="text-xs">
+                    {path.storageInstance.name}
                   </Badge>
-                  {path.storageInstance.description && (
-                    <span className="ml-1">({path.storageInstance.description})</span>
-                  )}
-                </div>
+                )}
+              </div>
+              
+              {path.description && (
+                <div className="text-sm text-muted-foreground mb-2">{path.description}</div>
               )}
               
-              <div className="flex items-center gap-1">
-                <span className="font-medium">创建者:</span>
-                <span>{path.createdBy?.username || '未知用户'}</span>
-              </div>
-              
-              <div className="flex items-center gap-1">
-                <span className="font-medium">创建时间:</span>
-                <span>{new Date(path.createdAt).toLocaleString()}</span>
+              <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                {path.storageInstance && (
+                  <div className="flex items-center gap-1">
+                    <span className="font-medium">存储实例:</span>
+                    <Badge variant="outline" className="text-xs">
+                      {getStorageInstanceTypeLabel(path.storageInstance.type)}
+                    </Badge>
+                    {path.storageInstance.description && (
+                      <span className="ml-1">({path.storageInstance.description})</span>
+                    )}
+                  </div>
+                )}
+                
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">创建者:</span>
+                  <span>{path.createdBy?.username || '未知用户'}</span>
+                </div>
+                
+                <div className="flex items-center gap-1">
+                  <span className="font-medium">创建时间:</span>
+                  <span>{new Date(path.createdAt).toLocaleString()}</span>
+                </div>
               </div>
             </div>
+            
+            {isAdmin && (
+              <div className="flex items-center gap-2 ml-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleGrantPermission(path.id)}
+                >
+                  授予权限
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleDelete(path.id)}
+                  disabled={deletingIds.has(path.id)}
+                >
+                  {deletingIds.has(path.id) ? '删除中...' : '删除'}
+                </Button>
+              </div>
+            )}
           </div>
-          
-          {isAdmin && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => handleDelete(path.id)}
-              disabled={deletingIds.has(path.id)}
-              className="ml-4"
-            >
-              {deletingIds.has(path.id) ? '删除中...' : '删除'}
-            </Button>
-          )}
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+
+      {permissionDialogOpen && selectedPathId && (
+        <StoragePermissionDialog
+          open={permissionDialogOpen}
+          onOpenChange={setPermissionDialogOpen}
+          onSuccess={handlePermissionGranted}
+          storagePathId={selectedPathId}
+        />
+      )}
+    </>
   );
 }

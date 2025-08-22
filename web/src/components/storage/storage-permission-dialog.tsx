@@ -12,21 +12,25 @@ import { useToast } from '@/components/ui/use-toast';
 import { apiClient } from '@/lib/api-client';
 import { useAuth } from '@/contexts/auth-context';
 
+// 修改表单结构，支持每个用户的独立权限选择
 const formSchema = z.object({
-  userIds: z.array(z.string()).min(1, { message: '请至少选择一个用户' }),
+  userPermissions: z.array(z.object({
+    userId: z.string(),
+    permission: z.enum(['read', 'write']),
+  })).min(1, { message: '请至少选择一个用户' }),
   storagePathId: z.string().min(1, { message: '请选择存储路径' }),
-  permission: z.enum(['read', 'write'], { message: '请选择权限类型' }),
 });
 
 interface StoragePermissionDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSuccess: (permission: any) => void;
-  storagePaths: Array<{
+  storagePaths?: Array<{
     id: number;
     path: string;
     description?: string;
   }>;
+  storagePathId?: number; // 新增：直接指定存储路径ID
 }
 
 interface User {
@@ -39,21 +43,29 @@ export function StoragePermissionDialog({
   open, 
   onOpenChange, 
   onSuccess, 
-  storagePaths 
+  storagePaths,
+  storagePathId
 }: StoragePermissionDialogProps) {
   const { toast } = useToast();
   const { token } = useAuth();
   const [loading, setLoading] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
+  const [selectedUserIds, setSelectedUserIds] = useState<Set<number>>(new Set());
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      userIds: [],
-      storagePathId: '',
-      permission: 'read',
+      userPermissions: [],
+      storagePathId: storagePathId ? storagePathId.toString() : '',
     },
   });
+
+  // 当storagePathId变化时，更新表单值
+  useEffect(() => {
+    if (storagePathId) {
+      form.setValue('storagePathId', storagePathId.toString());
+    }
+  }, [storagePathId, form]);
 
   useEffect(() => {
     if (open) {
@@ -76,18 +88,55 @@ export function StoragePermissionDialog({
     }
   };
 
+  // 处理用户选择
+  const handleUserSelection = (userId: number, checked: boolean) => {
+    const newSelectedUserIds = new Set(selectedUserIds);
+    if (checked) {
+      newSelectedUserIds.add(userId);
+    } else {
+      newSelectedUserIds.delete(userId);
+    }
+    setSelectedUserIds(newSelectedUserIds);
+    
+    // 更新表单中的用户权限数组
+    const userPermissions = Array.from(newSelectedUserIds).map(id => ({
+      userId: id.toString(),
+      permission: 'read' as const, // 默认只读权限
+    }));
+    form.setValue('userPermissions', userPermissions);
+  };
+
+  // 处理单个用户的权限变更
+  const handlePermissionChange = (userId: number, permission: 'read' | 'write') => {
+    const currentPermissions = form.getValues('userPermissions');
+    const updatedPermissions = currentPermissions.map(up => 
+      up.userId === userId.toString() 
+        ? { ...up, permission } 
+        : up
+    );
+    form.setValue('userPermissions', updatedPermissions);
+  };
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (!token) return;
     
     try {
       setLoading(true);
-      const response = await apiClient.post('/storage/permissions', {
-        userIds: values.userIds.map(id => parseInt(id)),
-        storagePathId: parseInt(values.storagePathId),
-        permission: values.permission,
-      }, token);
-      onSuccess(response.data);
+      
+      // 为每个用户单独创建权限
+      const promises = values.userPermissions.map(userPerm => 
+        apiClient.post('/storage/permissions', {
+          userIds: [parseInt(userPerm.userId)],
+          storagePathId: storagePathId || parseInt(values.storagePathId),
+          permission: userPerm.permission,
+        }, token)
+      );
+      
+      await Promise.all(promises);
+      
+      onSuccess({ message: '权限授予成功' });
       form.reset();
+      setSelectedUserIds(new Set());
     } catch (error: any) {
       toast({
         title: '错误',
@@ -102,96 +151,103 @@ export function StoragePermissionDialog({
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
       form.reset();
+      setSelectedUserIds(new Set());
     }
     onOpenChange(newOpen);
   };
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>批量授予存储权限</DialogTitle>
+          <DialogTitle>
+            {storagePathId ? '授予存储路径权限' : '批量授予存储权限'}
+          </DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="userIds"
-              render={({ field }) => (
+              name="userPermissions"
+              render={() => (
                 <FormItem>
-                  <FormLabel>选择用户（可多选）</FormLabel>
-                  <div className="space-y-2">
-                    {users.map((user) => (
-                      <div key={user.id} className="flex items-center space-x-2">
-                        <input
-                          type="checkbox"
-                          id={`user-${user.id}`}
-                          value={user.id.toString()}
-                          checked={field.value.includes(user.id.toString())}
-                          onChange={(e) => {
-                            if (e.target.checked) {
-                              field.onChange([...field.value, e.target.value]);
-                            } else {
-                              field.onChange(field.value.filter(id => id !== e.target.value));
-                            }
-                          }}
-                          className="rounded border-gray-300"
-                        />
-                        <label htmlFor={`user-${user.id}`} className="text-sm">
-                          {user.username} ({user.email})
-                        </label>
-                      </div>
-                    ))}
+                  <FormLabel>选择用户并设置权限（可多选）</FormLabel>
+                  <div className="space-y-3 max-h-60 overflow-y-auto border rounded-md p-3">
+                    {users.map((user) => {
+                      const isSelected = selectedUserIds.has(user.id);
+                      const userPermission = form.getValues('userPermissions').find(
+                        up => up.userId === user.id.toString()
+                      );
+                      
+                      return (
+                        <div key={user.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-gray-50">
+                          <div className="flex items-center space-x-3">
+                            <input
+                              type="checkbox"
+                              id={`user-${user.id}`}
+                              checked={isSelected}
+                              onChange={(e) => handleUserSelection(user.id, e.target.checked)}
+                              className="rounded border-gray-300"
+                            />
+                            <label htmlFor={`user-${user.id}`} className="text-sm font-medium">
+                              {user.username} ({user.email})
+                            </label>
+                          </div>
+                          
+                          {isSelected && (
+                            <Select
+                              value={userPermission?.permission || 'read'}
+                              onValueChange={(value: 'read' | 'write') => 
+                                handlePermissionChange(user.id, value)
+                              }
+                            >
+                              <FormControl>
+                                <SelectTrigger className="w-24">
+                                  <SelectValue />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="read">只读</SelectItem>
+                                <SelectItem value="write">读写</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                   <FormMessage />
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="storagePathId"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>选择存储路径</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择存储路径" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      {storagePaths.map((path) => (
-                        <SelectItem key={path.id} value={path.id.toString()}>
-                          {path.path} {path.description && `(${path.description})`}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="permission"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>权限类型</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="选择权限类型" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="read">只读</SelectItem>
-                      <SelectItem value="write">读写</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            
+            {!storagePathId && (
+              <FormField
+                control={form.control}
+                name="storagePathId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>选择存储路径</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="选择存储路径" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {storagePaths?.map((path) => (
+                          <SelectItem key={path.id} value={path.id.toString()}>
+                            {path.path} {path.description && `(${path.description})`}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+            
             <div className="flex justify-end space-x-2">
               <Button
                 type="button"
@@ -201,8 +257,8 @@ export function StoragePermissionDialog({
               >
                 取消
               </Button>
-              <Button type="submit" disabled={loading}>
-                {loading ? '授予中...' : '批量授予权限'}
+              <Button type="submit" disabled={loading || selectedUserIds.size === 0}>
+                {loading ? '授予中...' : (storagePathId ? '授予权限' : '批量授予权限')}
               </Button>
             </div>
           </form>
